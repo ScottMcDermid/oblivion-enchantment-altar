@@ -1,18 +1,37 @@
-import React, { useState } from 'react';
-import { TextField, Button, Tooltip } from '@mui/material';
+import React, { useMemo, useState } from 'react';
+import { TextField, Button, Tooltip, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import Image from 'next/image';
 
-import { spellEffectDefinitions, type SpellEffectDefinition } from '@/utils/spellEffectUtils';
-import { useSpellStore } from '@/data/spellStore';
+import {
+  equipmentTypes,
+  weaponSpellEffectDefinitions,
+  wornSpellEffectDefinitions,
+  type EquipmentType,
+  type SpellEffectDefinition,
+} from '@/utils/spellEffectUtils';
+import { useEnchantmentStore } from '@/data/enchantmentStore';
 
 export default function SpellEffectSelector({
   onEffectSelect,
+  equipmentType,
+  onEquipmentTypeChange,
 }: {
   onEffectSelect: (effect: SpellEffectDefinition) => void;
+  equipmentType: EquipmentType;
+  onEquipmentTypeChange: (type: EquipmentType) => void;
 }) {
   const [search, setSearch] = useState('');
 
-  const { addedEffects } = useSpellStore();
+  const { addedEffects } = useEnchantmentStore();
+
+  const [spellEffectDefinitions, setSpellEffectDefinitions] = useState<SpellEffectDefinition[]>(
+    weaponSpellEffectDefinitions,
+  );
+
+  useMemo(() => {
+    if (equipmentType === 'Weapon') setSpellEffectDefinitions(weaponSpellEffectDefinitions);
+    else if (equipmentType === 'Worn') setSpellEffectDefinitions(wornSpellEffectDefinitions);
+  }, [equipmentType]);
 
   const filteredEffects: SpellEffectDefinition[] = spellEffectDefinitions.filter((effect) => {
     const addedSpellEffectIds = addedEffects.map((effect) => effect.id);
@@ -24,6 +43,22 @@ export default function SpellEffectSelector({
 
   return (
     <div className="flex h-full flex-col">
+      <div className="flex flex-col place-items-center">
+        <div className="text-sm text-ghost">Equipment</div>
+        <ToggleButtonGroup
+          exclusive
+          value={equipmentType}
+          onChange={(_e, type) => type !== null && onEquipmentTypeChange(type)}
+          className="m-auto mb-4"
+        >
+          {equipmentTypes.map((type) => (
+            <ToggleButton key={type} value={type} className="min-w-14 py-1 sm:min-w-32">
+              {type}
+            </ToggleButton>
+          ))}
+        </ToggleButtonGroup>
+      </div>
+
       <TextField
         label="Search Effects"
         variant="outlined"

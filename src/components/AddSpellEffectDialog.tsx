@@ -29,21 +29,15 @@ import {
   MIN_MAGNITUDE,
   type SpellEffect,
   type SpellEffectDefinition,
-  type SpellEffectRange,
-  applySkillMultiplier,
-  spellEffectDefinitionById,
   attributes,
   skills as selectableSkills,
   Attribute,
   Skill,
-  lockLevels,
-  LockLevel,
-  magnitudeByLockLevel,
 } from '@/utils/spellEffectUtils';
 
-import ToggleButtons from '@/components/ToggleButtons';
-import { useSpellStore } from '@/data/spellStore';
+import { useEnchantmentStore } from '@/data/enchantmentStore';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { getWornEffectMagnitude } from '@/utils/enchantmentUtils';
 
 export default function SpellEffectDialog(props: {
   effectDefinition: SpellEffectDefinition;
@@ -52,7 +46,6 @@ export default function SpellEffectDialog(props: {
   onClose: () => void;
   onSpellEffectConfirmed: (effectDefinition: SpellEffect) => void;
 }) {
-  const [range, setRange] = useState<SpellEffectRange>('Touch');
   const [magnitude, setMagnitude] = useState(MIN_MAGNITUDE);
   const [area, setArea] = useState(MIN_AREA);
   const [duration, setDuration] = useState(MIN_DURATION);
@@ -62,36 +55,21 @@ export default function SpellEffectDialog(props: {
   const [skill, setSkill] = useState(
     props.effect?.skill ? props.effect.skill : selectableSkills[0],
   );
-  const [lockLevel, setLockLevel] = useState(
-    props.effect?.lockLevel ? props.effect.lockLevel : lockLevels[0],
-  );
-
   const {
-    skills,
-    luck,
+    equipmentType,
+    soulGem,
     actions: { removeSpellEffect },
-  } = useSpellStore();
+  } = useEnchantmentStore();
 
-  const baseMagickaCost = useMemo(
+  const magickaCost = useMemo(
     () =>
       getMagickaCost({
         baseCost: props.effectDefinition.baseCost,
         magnitude,
         area,
         duration,
-        range,
       }),
-    [props.effectDefinition.baseCost, range, magnitude, area, duration],
-  );
-
-  const magickaCost = useMemo(
-    () =>
-      applySkillMultiplier(
-        baseMagickaCost,
-        skills[spellEffectDefinitionById[props.effectDefinition.id].school],
-        luck,
-      ),
-    [baseMagickaCost, skills, luck, props.effectDefinition.id],
+    [props.effectDefinition.baseCost, magnitude, area, duration],
   );
 
   const goldCost = useMemo(() => getGoldCost(magickaCost), [magickaCost]);
@@ -103,35 +81,24 @@ export default function SpellEffectDialog(props: {
       setMagnitude(props.effect.magnitude);
       setArea(props.effect.area);
       setDuration(props.effect.duration);
-      setRange(props.effect.range);
       setAttribute(props.effect.attribute ?? attributes[0]);
       setSkill(props.effect.skill ?? selectableSkills[0]);
-      setLockLevel(props.effect.lockLevel ?? lockLevels[0]);
     } else {
       setMagnitude(
-        props.effectDefinition.availableParameters.includes('Magnitude') ? MIN_MAGNITUDE : 0,
+        props.effectDefinition.availableParameters.includes('Magnitude')
+          ? equipmentType === 'Worn'
+            ? getWornEffectMagnitude(props.effectDefinition.baseCost, soulGem)
+            : MIN_MAGNITUDE
+          : 0,
       );
       setArea(0);
       setDuration(
         props.effectDefinition.availableParameters.includes('Duration') ? MIN_DURATION : 0,
       );
-      setRange(props.effectDefinition.availableRanges[0]);
       setAttribute(attributes[0]);
       setSkill(selectableSkills[0]);
-      setLockLevel(lockLevels[0]);
     }
-  }, [
-    props.open,
-    props.effect,
-    props.effectDefinition.availableParameters,
-    props.effectDefinition.availableRanges,
-  ]);
-
-  useEffect(() => {
-    if (props.effectDefinition.selectableLockLevel) {
-      setMagnitude(magnitudeByLockLevel[lockLevel]);
-    }
-  }, [lockLevel, props.effectDefinition.selectableLockLevel]);
+  }, [props.open, props.effect, props.effectDefinition, equipmentType, soulGem]);
 
   return (
     <Dialog
@@ -196,33 +163,6 @@ export default function SpellEffectDialog(props: {
             </FormControl>
           )}
 
-          {props.effectDefinition.selectableLockLevel && (
-            <FormControl className="w-full">
-              <InputLabel id="lock-level-select-label">LockLevel</InputLabel>
-              <Select
-                labelId="lock-level-select-label"
-                value={lockLevel}
-                label="LockLevel"
-                onChange={(e) => setLockLevel(e.target.value as LockLevel)}
-              >
-                {lockLevels.map((option) => (
-                  <MenuItem key={option} value={option}>
-                    {option}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          )}
-
-          {props.effectDefinition.availableRanges.length > 1 && (
-            <ToggleButtons
-              name="Range"
-              value={range}
-              options={props.effectDefinition.availableRanges}
-              onChangeHandler={(range) => setRange(range as SpellEffectRange)}
-            />
-          )}
-
           {props.effectDefinition.availableParameters.includes('Magnitude') && (
             <div>
               <div className="mb-1 flex justify-between">
@@ -276,14 +216,14 @@ export default function SpellEffectDialog(props: {
           <Tooltip title="Magicka Cost">
             <div className="flex items-center gap-1">
               <FlashOn fontSize="small" />
-              <span>{Intl.NumberFormat().format(magickaCost)}</span>
+              <span>{Intl.NumberFormat().format(Math.floor(magickaCost))}</span>
             </div>
           </Tooltip>
 
           <Tooltip title="Gold Cost">
             <div className="flex items-center gap-1">
               <AttachMoney fontSize="small" />
-              <span>{Intl.NumberFormat().format(goldCost)}</span>
+              <span>{Intl.NumberFormat().format(Math.floor(goldCost))}</span>
             </div>
           </Tooltip>
         </div>
@@ -324,14 +264,12 @@ export default function SpellEffectDialog(props: {
             onClick={() => {
               const spellEffectConfig: SpellEffect = {
                 id: props.effectDefinition.id,
-                range,
                 magnitude,
                 area,
                 duration,
-                magickaCost: baseMagickaCost,
+                magickaCost,
                 ...(props.effectDefinition.selectableAttribute && { attribute }),
                 ...(props.effectDefinition.selectableSkill && { skill }),
-                ...(props.effectDefinition.selectableLockLevel && { lockLevel }),
               };
               props.onSpellEffectConfirmed(spellEffectConfig);
             }}

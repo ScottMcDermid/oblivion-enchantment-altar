@@ -1,44 +1,41 @@
-import type { School, SpellEffect } from '@/utils/spellEffectUtils';
+import type { EquipmentType, SpellEffect } from '@/utils/spellEffectUtils';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { upsert } from '@/utils/array';
+import { SoulGem } from '@/utils/enchantmentUtils';
 
 type State = {
   addedEffects: SpellEffect[];
-  skills: Record<School, number>;
-  luck: number;
+  equipmentType: EquipmentType;
+  soulGem: SoulGem;
   version: number;
 };
 
 type Action = {
   addSpellEffect: (spellEffect: SpellEffect) => void;
   removeSpellEffect: (spellEffect: SpellEffect) => void;
-  setSkills: (skills: Partial<Record<School, number>>) => void;
-  setLuck: (luck: number) => void;
-  resetSpell: () => void;
+  resetEnchantment: () => void;
+  toggleEquipmentType: () => void;
+  setSoulGem: (soulGem: SoulGem) => void;
 };
 
-type SpellStore = State & { actions: Action };
+type EnchantmentStore = State & { actions: Action };
 
-const useSpellStore = create<SpellStore>()(
+const useEnchantmentStore = create<EnchantmentStore>()(
   persist(
     (set) => {
       return {
         addedEffects: [],
-        skills: {
-          Alteration: 100,
-          Conjuration: 100,
-          Destruction: 100,
-          Illusion: 100,
-          Mysticism: 100,
-          Restoration: 100,
-        },
-        luck: 50,
+        equipmentType: 'Weapon',
+        soulGem: 'Grand',
         version: 1,
         actions: {
           addSpellEffect: (effect) =>
             set((state) => ({
-              addedEffects: upsert<SpellEffect>(state.addedEffects, effect, 'id'),
+              addedEffects:
+                state.equipmentType === 'Worn'
+                  ? [effect]
+                  : upsert<SpellEffect>(state.addedEffects, effect, 'id'),
             })),
           removeSpellEffect: (effect) =>
             set((state) => ({
@@ -46,13 +43,13 @@ const useSpellStore = create<SpellStore>()(
                 (existingEffect) => effect.id !== existingEffect.id,
               ),
             })),
-          setSkills: (skills) => {
-            set((state) => ({ skills: { ...state.skills, ...skills } }));
-          },
-          setLuck: (luck) => {
-            set(() => ({ luck }));
-          },
-          resetSpell: () => {
+          toggleEquipmentType: () =>
+            set((state) => ({
+              equipmentType: state.equipmentType === 'Weapon' ? 'Worn' : 'Weapon',
+              addedEffects: [],
+            })),
+          setSoulGem: (soulGem) => set(() => ({ soulGem })),
+          resetEnchantment: () => {
             set(() => ({ addedEffects: [] }));
           },
         },
@@ -66,12 +63,11 @@ const useSpellStore = create<SpellStore>()(
       ),
       partialize: (state) => ({
         addedEffects: state.addedEffects,
-        skills: state.skills,
-        luck: state.luck,
+        equipmentType: state.equipmentType,
         version: state.version,
       }),
     },
   ),
 );
 
-export { useSpellStore };
+export { useEnchantmentStore };

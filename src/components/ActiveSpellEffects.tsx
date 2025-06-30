@@ -1,12 +1,7 @@
-import React, { useMemo } from 'react';
-import { useSpellStore } from '@/data/spellStore';
+import React from 'react';
+import { useEnchantmentStore } from '@/data/enchantmentStore';
 import Image from 'next/image';
-import {
-  applySkillMultiplier,
-  getGoldCost,
-  SpellEffect,
-  spellEffectDefinitionById,
-} from '@/utils/spellEffectUtils';
+import { getGoldCost, SpellEffect, spellEffectDefinitionById } from '@/utils/spellEffectUtils';
 import { Tooltip } from '@mui/material';
 import { cn } from '@/utils/cn';
 
@@ -15,33 +10,11 @@ export default function ActiveSpellEffects({
 }: {
   onEffectSelect?: (effect: SpellEffect) => void;
 }) {
-  const { addedEffects, skills, luck } = useSpellStore();
-
-  const maxEffect: SpellEffect | undefined = useMemo(
-    () =>
-      addedEffects.reduce<SpellEffect | undefined>(
-        (max, effect) =>
-          !max || Math.floor(effect.magickaCost) > Math.floor(max.magickaCost) ? effect : max,
-        undefined,
-      ),
-    [addedEffects],
-  );
-
-  const magickaCosts: number[] = useMemo(
-    () =>
-      addedEffects.map((effect) =>
-        applySkillMultiplier(
-          effect.magickaCost,
-          skills[spellEffectDefinitionById[effect.id].school],
-          luck,
-        ),
-      ),
-    [skills, luck, addedEffects],
-  );
+  const { addedEffects } = useEnchantmentStore();
 
   return (
     <div className="relative w-full bg-inherit">
-      <div className="sticky top-0 z-10 grid grid-cols-[2rem_minmax(0,1fr)_4rem_4rem_4rem_4rem] items-center bg-inherit py-2 pb-2 pr-2 pt-6 text-sm font-semibold shadow-lg lg:grid-cols-[2rem_minmax(0,1fr)_6rem_4rem_6rem_4rem_6rem_6rem]">
+      <div className="sticky top-0 z-10 grid grid-cols-[2rem_minmax(0,1fr)_4rem_4rem_4rem] items-center bg-inherit py-2 pb-2 pr-2 pt-6 text-sm font-semibold shadow-lg lg:grid-cols-[2rem_minmax(0,1fr)_6rem_4rem_6rem_6rem_6rem]">
         {/* Spell effect icon */}
         <span></span>
 
@@ -66,12 +39,6 @@ export default function ActiveSpellEffects({
           <span className="hidden lg:inline">Duration</span>
         </span>
 
-        {/* Range */}
-        <span className="text-right">
-          <span className="inline lg:hidden">Range</span>
-          <span className="hidden lg:inline">Range</span>
-        </span>
-
         {/* Magicka */}
         <span className="col-span-0 hidden text-right lg:col-span-1 lg:inline">Magicka</span>
 
@@ -85,7 +52,7 @@ export default function ActiveSpellEffects({
         <div className="items-center px-2 py-2 text-sm">No Active Effects</div>
       )}
 
-      {addedEffects.map((effect, i) => (
+      {addedEffects.map((effect) => (
         <div
           key={effect.id}
           role="button"
@@ -94,9 +61,8 @@ export default function ActiveSpellEffects({
           onKeyDown={(e) => e.key === 'Enter' && onEffectSelect(effect)}
           className={cn(
             'grid items-center py-2 pr-2 text-sm hover:bg-[#2f2f2f]',
-            'grid-cols-[2rem_minmax(0,1fr)_4rem_4rem_4rem_4rem]',
-            'lg:grid-cols-[2rem_minmax(0,1fr)_6rem_4rem_6rem_4rem_6rem_6rem]',
-            maxEffect && effect.id === maxEffect.id ? 'border-l-4 border-l-yellow-400' : 'pl-1',
+            'grid-cols-[2rem_minmax(0,1fr)_4rem_4rem_4rem]',
+            'lg:grid-cols-[2rem_minmax(0,1fr)_6rem_4rem_6rem_6rem_6rem]',
           )}
         >
           {/* Spell effect icon */}
@@ -142,17 +108,14 @@ export default function ActiveSpellEffects({
               `${effect.duration}s`}
           </span>
 
-          {/* Range */}
-          <span className="text-right">{effect.range}</span>
-
           {/* Magicka Cost */}
           <span className="col-span-0 hidden text-right lg:col-span-1 lg:inline">
-            {Intl.NumberFormat().format(Math.floor(magickaCosts[i]))}
+            {Intl.NumberFormat().format(Math.floor(effect.magickaCost))}
           </span>
 
           {/* Gold Cost */}
           <span className="col-span-0 hidden text-right lg:col-span-1 lg:inline">
-            {Intl.NumberFormat().format(getGoldCost(magickaCosts[i]))}
+            {Intl.NumberFormat().format(Math.floor(getGoldCost(effect.magickaCost)))}
           </span>
         </div>
       ))}

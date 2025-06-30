@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { Button, StyledEngineProvider } from '@mui/material';
-import BookIcon from '@mui/icons-material/Book';
 import DeleteIcon from '@mui/icons-material/Delete';
 import theme from '@/app/theme';
 
@@ -16,28 +15,36 @@ import {
   type SpellEffectDefinition,
 } from '@/utils/spellEffectUtils';
 
-import { useSpellStore } from '@/data/spellStore';
+import { useEnchantmentStore } from '@/data/enchantmentStore';
 import ActiveSpellEffects from '@/components/ActiveSpellEffects';
-import ActiveSpellSummary from '@/components/ActiveSpellSummary';
-import CharacterSkillsDrawer from '@/components/CharacterSkillsDrawer';
+import EnchantmentSummary from '@/components/EnchantmentSummary';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import { SoulGemSelector } from '@/components/SoulGemSelector';
 
 export default function Home() {
   const {
     addedEffects,
-    actions: { addSpellEffect, resetSpell },
-  } = useSpellStore();
+    equipmentType,
+    actions: { addSpellEffect, resetEnchantment, toggleEquipmentType },
+  } = useEnchantmentStore();
   const [isAddSpellEffectOpen, setIsAddSpellEffectOpen] = useState(false);
-  const [isCharacterSkillsOpen, setIsCharacterSkillsOpen] = useState(false);
   const [isConfirmingReset, setIsConfirmingReset] = useState(false);
+  const [isConfirmingEquipmentToggle, setIsConfirmingEquipmentToggle] = useState(false);
   const [editEffect, setEditEffect] = useState<SpellEffect | null>(null);
   const [selectedEffect, setSelectedEffect] = useState<SpellEffectDefinition | null>(null);
 
   const handleReset = (confirm: boolean) => {
     if (confirm) {
-      resetSpell();
+      resetEnchantment();
     }
     setIsConfirmingReset(false);
+  };
+
+  const handleEquipmentToggle = (confirm: boolean) => {
+    if (confirm) {
+      toggleEquipmentType();
+    }
+    setIsConfirmingEquipmentToggle(false);
   };
 
   useEffect(() => {
@@ -55,14 +62,6 @@ export default function Home() {
           {/* Nav bar */}
           <div className="z-20 flex h-12 w-full flex-row justify-between px-2 pt-6 sm:pt-2">
             <div className="flex place-items-center">
-              <Button
-                variant="contained"
-                aria-label="Adjust your skills"
-                onClick={() => setIsCharacterSkillsOpen(true)}
-              >
-                <BookIcon />
-                <div className="hidden sm:block">&nbsp;Skills</div>
-              </Button>
               {addedEffects.length > 0 && (
                 <Button
                   className="mx-2"
@@ -77,17 +76,24 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="flex w-full flex-1 flex-col justify-center gap-6 overflow-y-auto bg-inherit pt-4 sm:flex-row">
+          <div className="flex w-full flex-1 flex-col justify-center gap-6 overflow-y-auto bg-inherit sm:flex-row">
             <div className="flex min-h-0 flex-1 flex-shrink-0 flex-col sm:max-w-80">
               <SpellEffectSelector
                 onEffectSelect={(effect) => {
                   setSelectedEffect(effect);
                   setIsAddSpellEffectOpen(true);
                 }}
+                equipmentType={equipmentType}
+                onEquipmentTypeChange={() =>
+                  addedEffects.length > 0
+                    ? setIsConfirmingEquipmentToggle(true)
+                    : toggleEquipmentType()
+                }
               />
             </div>
 
             <div className="mt-3 max-h-80 flex-1 bg-inherit sm:max-h-full lg:max-w-full">
+              <SoulGemSelector />
               <ActiveSpellEffects
                 onEffectSelect={(effect) => {
                   setSelectedEffect(spellEffectDefinitionById[effect.id]);
@@ -95,7 +101,7 @@ export default function Home() {
                   setIsAddSpellEffectOpen(true);
                 }}
               />
-              <div className="mt-3">{addedEffects.length > 0 && <ActiveSpellSummary />}</div>
+              <div className="mt-3">{addedEffects.length > 0 && <EnchantmentSummary />}</div>
             </div>
           </div>
         </div>
@@ -113,15 +119,16 @@ export default function Home() {
           />
         )}
 
-        <CharacterSkillsDrawer
-          open={isCharacterSkillsOpen}
-          onClose={() => setIsCharacterSkillsOpen(false)}
+        <ConfirmDialog
+          open={isConfirmingReset}
+          description="This will delete all enchantment effects"
+          handleClose={handleReset}
         />
 
         <ConfirmDialog
-          open={isConfirmingReset}
-          description="This will delete all spell effects"
-          handleClose={handleReset}
+          open={isConfirmingEquipmentToggle}
+          description="This will delete all enchantment effects"
+          handleClose={handleEquipmentToggle}
         />
       </ThemeProvider>
     </StyledEngineProvider>
