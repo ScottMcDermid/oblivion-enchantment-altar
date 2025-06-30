@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://enchanting.oblivion.tools/sitemap.xml
