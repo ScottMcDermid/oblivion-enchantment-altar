@@ -244,6 +244,7 @@ export type SpellEffectDefinition = {
   availableParameters: SpellEffectParameter[];
   availableEquipment: EquipmentType[];
   unit: string;
+  isCursedEnchantment?: boolean;
 };
 
 export type SpellEffect = {
@@ -512,6 +513,7 @@ export const spellEffectDefinitionById: Record<SpellEffectDefinitionId, SpellEff
     availableParameters: ['Magnitude', 'Area', 'Duration'],
     constantEffectFactor: 0,
     availableEquipment: ['Weapon', 'Worn'],
+    isCursedEnchantment: true,
     unit: 'pts',
   },
   BWAX: {
@@ -682,6 +684,7 @@ export const spellEffectDefinitionById: Record<SpellEffectDefinitionId, SpellEff
     description: "Damages target's named attribute.",
     availableParameters: ['Magnitude', 'Area', 'Duration'],
     availableEquipment: ['Weapon', 'Worn'],
+    isCursedEnchantment: true,
     unit: 'pts',
   },
   DGFA: {
@@ -694,6 +697,7 @@ export const spellEffectDefinitionById: Record<SpellEffectDefinitionId, SpellEff
     description: "Damages target's Fatigue.",
     availableParameters: ['Magnitude', 'Area', 'Duration'],
     availableEquipment: ['Weapon', 'Worn'],
+    isCursedEnchantment: true,
     unit: 'pts',
   },
   DGHE: {
@@ -706,6 +710,7 @@ export const spellEffectDefinitionById: Record<SpellEffectDefinitionId, SpellEff
     description: "Damages target's Health.",
     availableParameters: ['Magnitude', 'Area', 'Duration'],
     availableEquipment: ['Weapon', 'Worn'],
+    isCursedEnchantment: true,
     unit: 'pts',
   },
   DGSP: {
@@ -718,6 +723,7 @@ export const spellEffectDefinitionById: Record<SpellEffectDefinitionId, SpellEff
     description: "Damages target's Magicka.",
     availableParameters: ['Magnitude', 'Area', 'Duration'],
     availableEquipment: ['Weapon', 'Worn'],
+    isCursedEnchantment: true,
     unit: 'pts',
   },
   DIAR: {
@@ -730,6 +736,7 @@ export const spellEffectDefinitionById: Record<SpellEffectDefinitionId, SpellEff
     description: 'Damage the Health of equipped armor.',
     availableParameters: ['Magnitude', 'Area', 'Duration'],
     availableEquipment: ['Weapon', 'Worn'],
+    isCursedEnchantment: true,
     unit: 'pts',
   },
   DIWE: {
@@ -742,6 +749,7 @@ export const spellEffectDefinitionById: Record<SpellEffectDefinitionId, SpellEff
     description: 'Damage the Health of an equipped weapon.',
     availableParameters: ['Magnitude', 'Area', 'Duration'],
     availableEquipment: ['Weapon', 'Worn'],
+    isCursedEnchantment: true,
     unit: 'pts',
   },
   DRAT: {
@@ -755,6 +763,7 @@ export const spellEffectDefinitionById: Record<SpellEffectDefinitionId, SpellEff
     description: "Temporarily lowers target's named attribute.",
     availableParameters: ['Magnitude', 'Area', 'Duration'],
     availableEquipment: ['Weapon', 'Worn'],
+    isCursedEnchantment: true,
     unit: 'pts',
   },
   DRFA: {
@@ -767,6 +776,7 @@ export const spellEffectDefinitionById: Record<SpellEffectDefinitionId, SpellEff
     description: "Temporarily lowers target's Fatigue.",
     availableParameters: ['Magnitude', 'Area', 'Duration'],
     availableEquipment: ['Weapon', 'Worn'],
+    isCursedEnchantment: true,
     unit: 'pts',
   },
   DRHE: {
@@ -779,6 +789,7 @@ export const spellEffectDefinitionById: Record<SpellEffectDefinitionId, SpellEff
     description: "Temporarily lowers target's Health.",
     availableParameters: ['Magnitude', 'Area', 'Duration'],
     availableEquipment: ['Weapon', 'Worn'],
+    isCursedEnchantment: true,
     unit: 'pts',
   },
   DRSK: {
@@ -792,6 +803,7 @@ export const spellEffectDefinitionById: Record<SpellEffectDefinitionId, SpellEff
     description: "Temporarily lowers target's named skill.",
     availableParameters: ['Magnitude', 'Area', 'Duration'],
     availableEquipment: ['Weapon', 'Worn'],
+    isCursedEnchantment: true,
     unit: 'pts',
   },
   DRSP: {
@@ -804,6 +816,7 @@ export const spellEffectDefinitionById: Record<SpellEffectDefinitionId, SpellEff
     description: "Temporarily lowers target's Magicka.",
     availableParameters: ['Magnitude', 'Area', 'Duration'],
     availableEquipment: ['Weapon', 'Worn'],
+    isCursedEnchantment: true,
     unit: 'pts',
   },
   DSPL: {
@@ -839,6 +852,7 @@ export const spellEffectDefinitionById: Record<SpellEffectDefinitionId, SpellEff
     description: 'Produce a manifestation of elemental fire.',
     availableParameters: ['Magnitude', 'Area', 'Duration'],
     availableEquipment: ['Weapon', 'Worn'],
+    isCursedEnchantment: true,
     unit: 'pts',
   },
   FISH: {
@@ -1223,6 +1237,7 @@ export const spellEffectDefinitionById: Record<SpellEffectDefinitionId, SpellEff
     description: 'Produce a manifestation of elemental shock.',
     availableParameters: ['Magnitude', 'Area', 'Duration'],
     availableEquipment: ['Weapon', 'Worn'],
+    isCursedEnchantment: true,
     unit: 'pts',
   },
   SHLD: {
@@ -1313,6 +1328,7 @@ export const spellEffectDefinitionById: Record<SpellEffectDefinitionId, SpellEff
     description: "Decrease target's resistance to common disease.",
     availableParameters: ['Magnitude', 'Area', 'Duration'],
     availableEquipment: ['Weapon', 'Worn'],
+    isCursedEnchantment: true,
     unit: 'pts',
   },
   WKFI: {
@@ -1325,6 +1341,7 @@ export const spellEffectDefinitionById: Record<SpellEffectDefinitionId, SpellEff
     description: "Decrease target's resistance to elemental fire.",
     availableParameters: ['Magnitude', 'Area', 'Duration'],
     availableEquipment: ['Weapon', 'Worn'],
+    isCursedEnchantment: true,
     unit: 'pts',
   },
   WKFR: {
@@ -1337,6 +1354,7 @@ export const spellEffectDefinitionById: Record<SpellEffectDefinitionId, SpellEff
     description: "Decrease target's resistance to elemental frost.",
     availableParameters: ['Magnitude', 'Area', 'Duration'],
     availableEquipment: ['Weapon', 'Worn'],
+    isCursedEnchantment: true,
     unit: 'pts',
   },
   WKMA: {
@@ -1349,6 +1367,7 @@ export const spellEffectDefinitionById: Record<SpellEffectDefinitionId, SpellEff
     description: "Decrease target's resistance to magic.",
     availableParameters: ['Magnitude', 'Area', 'Duration'],
     availableEquipment: ['Weapon', 'Worn'],
+    isCursedEnchantment: true,
     unit: 'pts',
   },
   WKNW: {
@@ -1361,6 +1380,7 @@ export const spellEffectDefinitionById: Record<SpellEffectDefinitionId, SpellEff
     description: "Decrease target's resistance to normal weapons.",
     availableParameters: ['Magnitude', 'Area', 'Duration'],
     availableEquipment: ['Weapon', 'Worn'],
+    isCursedEnchantment: true,
     unit: 'pts',
   },
   WKPO: {
@@ -1373,6 +1393,7 @@ export const spellEffectDefinitionById: Record<SpellEffectDefinitionId, SpellEff
     description: "Decrease target's resistance to poison.",
     availableParameters: ['Magnitude', 'Area', 'Duration'],
     availableEquipment: ['Weapon', 'Worn'],
+    isCursedEnchantment: true,
     unit: 'pts',
   },
   WKSH: {
@@ -1385,6 +1406,7 @@ export const spellEffectDefinitionById: Record<SpellEffectDefinitionId, SpellEff
     description: "Decrease target's resistance to elemental shock.",
     availableParameters: ['Magnitude', 'Area', 'Duration'],
     availableEquipment: ['Weapon', 'Worn'],
+    isCursedEnchantment: true,
     unit: 'pts',
   },
   Z001: {
@@ -1774,7 +1796,7 @@ export function getMagickaCost({
   return Math.max(B * M * D * A, 1);
 }
 
-export const GOLD_MULTIPLIER = 3;
+const GOLD_MULTIPLIER = 10;
 export function getGoldCost({
   equipmentType,
   magickaCost,
@@ -1789,9 +1811,23 @@ export function getGoldCost({
     WABR: 2000,
     WAWA: 2000,
   };
-  if (equipmentType === 'Worn' && constantEffectOverrides[spellId])
-    return constantEffectOverrides[spellId];
-  return magickaCost * spellEffectDefinitionById[spellId].barterFactor;
+
+  if (equipmentType === 'Worn') {
+    // Special exceptions for some spell effects
+    if (constantEffectOverrides[spellId]) {
+      return constantEffectOverrides[spellId];
+    }
+
+    // Cursed, worn enchantments are free to craft
+    if (spellEffectDefinitionById[spellId].isCursedEnchantment) {
+      return 0;
+    }
+
+    return Math.floor(magickaCost * spellEffectDefinitionById[spellId].barterFactor);
+  }
+
+  // Weapon computation
+  return Math.floor(magickaCost * GOLD_MULTIPLIER);
 }
 
 export function getMasteryFromMagickaCost(magickaCost: number): Mastery {

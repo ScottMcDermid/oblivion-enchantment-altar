@@ -20,6 +20,20 @@ export default function ActiveSpellEffects({
     return 0;
   }, [addedEffects, soulGem, equipmentType]);
 
+  const goldCosts = useMemo(
+    () =>
+      addedEffects.map((effect) =>
+        Math.floor(
+          getGoldCost({
+            magickaCost: equipmentType === 'Worn' ? wornMagnitude : effect.magickaCost,
+            equipmentType,
+            spellId: effect.id,
+          }),
+        ),
+      ),
+    [addedEffects, equipmentType, wornMagnitude],
+  );
+
   return (
     <div className="relative w-full bg-inherit">
       <div className="sticky top-0 z-10 grid grid-cols-[2rem_minmax(0,1fr)_4rem_4rem_4rem] items-center bg-inherit py-2 pb-2 pr-2 pt-6 text-sm font-semibold shadow-lg lg:grid-cols-[2rem_minmax(0,1fr)_6rem_4rem_6rem_6rem_6rem]">
@@ -60,7 +74,7 @@ export default function ActiveSpellEffects({
         <div className="items-center px-2 py-2 text-sm">No Active Effects</div>
       )}
 
-      {addedEffects.map((effect) => (
+      {addedEffects.map((effect, i) => (
         <div
           key={effect.id}
           role="button"
@@ -127,11 +141,7 @@ export default function ActiveSpellEffects({
 
           {/* Gold Cost */}
           <span className="col-span-0 hidden text-right lg:col-span-1 lg:inline">
-            {Intl.NumberFormat().format(
-              Math.floor(
-                getGoldCost({ equipmentType, magickaCost: effect.magickaCost, spellId: effect.id }),
-              ),
-            )}
+            {Intl.NumberFormat().format(goldCosts[i])}
           </span>
         </div>
       ))}

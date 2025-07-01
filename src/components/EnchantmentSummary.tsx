@@ -27,7 +27,7 @@ export default function EnchantmentSummary() {
   );
 
   const uses = useMemo(
-    () => Math.floor(capacityBySoulGem[soulGem] / magickaCost),
+    () => Math.floor(capacityBySoulGem[soulGem] / Math.floor(magickaCost)),
     [magickaCost, soulGem],
   );
 
@@ -58,7 +58,7 @@ export default function EnchantmentSummary() {
 
         {equipmentType !== 'Worn' && (
           <Tooltip title="Uses">
-            <div className="flex min-w-16 items-center justify-end gap-1">
+            <div className="flex min-w-20 items-center justify-end gap-1">
               <BatteryIcon fontSize="small" />
               <span className="text-lg">{Intl.NumberFormat().format(uses)}</span>
             </div>
@@ -66,7 +66,7 @@ export default function EnchantmentSummary() {
         )}
 
         <Tooltip title="Gold Cost">
-          <div className="flex min-w-16 items-center justify-end gap-1">
+          <div className="flex min-w-20 items-center justify-end gap-1">
             <AttachMoney fontSize="small" />
             <span className="text-lg">{Intl.NumberFormat().format(Math.floor(goldCost))}</span>
           </div>
