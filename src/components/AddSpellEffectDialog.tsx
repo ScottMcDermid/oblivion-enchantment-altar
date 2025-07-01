@@ -37,7 +37,7 @@ import {
 
 import { useEnchantmentStore } from '@/data/enchantmentStore';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { getWornEffectMagnitude } from '@/utils/enchantmentUtils';
+import { getConstantEffectMagnitude } from '@/utils/enchantmentUtils';
 
 export default function SpellEffectDialog(props: {
   effectDefinition: SpellEffectDefinition;
@@ -72,7 +72,10 @@ export default function SpellEffectDialog(props: {
     [props.effectDefinition.baseCost, magnitude, area, duration],
   );
 
-  const goldCost = useMemo(() => getGoldCost(magickaCost), [magickaCost]);
+  const goldCost = useMemo(
+    () => getGoldCost(magickaCost, props.effectDefinition.barterFactor),
+    [magickaCost],
+  );
 
   useEffect(() => {
     if (!props.open) return;
@@ -87,7 +90,7 @@ export default function SpellEffectDialog(props: {
       setMagnitude(
         props.effectDefinition.availableParameters.includes('Magnitude')
           ? equipmentType === 'Worn'
-            ? getWornEffectMagnitude(props.effectDefinition.baseCost, soulGem)
+            ? getConstantEffectMagnitude(props.effectDefinition.id, soulGem)
             : MIN_MAGNITUDE
           : 0,
       );

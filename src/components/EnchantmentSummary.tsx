@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useEnchantmentStore } from '@/data/enchantmentStore';
-import { getGoldCost } from '@/utils/spellEffectUtils';
+import { getGoldCost, spellEffectDefinitionById } from '@/utils/spellEffectUtils';
 import { Tooltip, Typography } from '@mui/material';
 import FlashOn from '@mui/icons-material/FlashOn';
 import BatteryIcon from '@mui/icons-material/Battery0Bar';
@@ -15,7 +15,16 @@ export default function EnchantmentSummary() {
     [addedEffects],
   );
 
-  const goldCost = useMemo(() => getGoldCost(magickaCost), [magickaCost]);
+  const goldCost = useMemo(
+    () =>
+      addedEffects.reduce(
+        (goldCost, effect) =>
+          goldCost +
+          getGoldCost(effect.magickaCost, spellEffectDefinitionById[effect.id].barterFactor),
+        0,
+      ),
+    [addedEffects],
+  );
 
   const uses = useMemo(
     () => Math.floor(capacityBySoulGem[soulGem] / magickaCost),

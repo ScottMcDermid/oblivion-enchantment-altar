@@ -1,3 +1,5 @@
+import { spellEffectDefinitionById, type SpellEffectDefinitionId } from '@/utils/spellEffectUtils';
+
 export type SoulGem = 'Petty' | 'Lesser' | 'Common' | 'Greater' | 'Grand';
 export const soulGems: SoulGem[] = ['Petty', 'Lesser', 'Common', 'Greater', 'Grand'];
 
@@ -27,14 +29,8 @@ export const maxMagickaBySoulGem: Record<SoulGem, number> = {
 
 // https://en.uesp.net/wiki/Oblivion:Enchanting#Worn_Enchantments
 const MAGIC_CE_ENCHANT_MAG_OFFSET = 5.0;
-export function getWornEffectMagnitude(baseCost: number, soulGem: SoulGem) {
-  const CONSTANT_EFFECT_ENCHANTMENT_FACTOR =
-    (levelBySoulGem[soulGem] - 5) / levelBySoulGem[soulGem] / baseCost;
-  console.log(
-    `${baseCost} * ${CONSTANT_EFFECT_ENCHANTMENT_FACTOR} * ${levelBySoulGem[soulGem]} + ${MAGIC_CE_ENCHANT_MAG_OFFSET} = ${baseCost * levelBySoulGem[soulGem] + MAGIC_CE_ENCHANT_MAG_OFFSET}`,
-  );
-  return (
-    baseCost * CONSTANT_EFFECT_ENCHANTMENT_FACTOR * levelBySoulGem[soulGem] +
-    MAGIC_CE_ENCHANT_MAG_OFFSET
-  );
+export function getConstantEffectMagnitude(spellId: SpellEffectDefinitionId, soulGem: SoulGem) {
+  const constantEffectFactor = spellEffectDefinitionById[spellId].constantEffectFactor ?? 0;
+  const soulGemLevel = levelBySoulGem[soulGem];
+  return MAGIC_CE_ENCHANT_MAG_OFFSET + constantEffectFactor * soulGemLevel;
 }

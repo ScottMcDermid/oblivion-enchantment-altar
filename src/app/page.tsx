@@ -25,7 +25,7 @@ export default function Home() {
   const {
     addedEffects,
     equipmentType,
-    actions: { addSpellEffect, resetEnchantment, toggleEquipmentType },
+    actions: { addSpellEffect, resetEnchantment, removeSpellEffect, toggleEquipmentType },
   } = useEnchantmentStore();
   const [isAddSpellEffectOpen, setIsAddSpellEffectOpen] = useState(false);
   const [isConfirmingReset, setIsConfirmingReset] = useState(false);
@@ -80,6 +80,14 @@ export default function Home() {
             <div className="flex min-h-0 flex-1 flex-shrink-0 flex-col sm:max-w-80">
               <SpellEffectSelector
                 onEffectSelect={(effect) => {
+                  if (equipmentType === 'Worn')
+                    return addSpellEffect({
+                      id: effect.id,
+                      magickaCost: effect.baseCost,
+                      magnitude: 0,
+                      area: 0,
+                      duration: 0,
+                    });
                   setSelectedEffect(effect);
                   setIsAddSpellEffectOpen(true);
                 }}
@@ -96,6 +104,7 @@ export default function Home() {
               <SoulGemSelector />
               <ActiveSpellEffects
                 onEffectSelect={(effect) => {
+                  if (equipmentType === 'Worn') return removeSpellEffect(effect);
                   setSelectedEffect(spellEffectDefinitionById[effect.id]);
                   setEditEffect(effect);
                   setIsAddSpellEffectOpen(true);

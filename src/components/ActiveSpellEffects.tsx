@@ -1,16 +1,24 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useEnchantmentStore } from '@/data/enchantmentStore';
 import Image from 'next/image';
 import { getGoldCost, SpellEffect, spellEffectDefinitionById } from '@/utils/spellEffectUtils';
 import { Tooltip } from '@mui/material';
 import { cn } from '@/utils/cn';
+import { getConstantEffectMagnitude } from '@/utils/enchantmentUtils';
 
 export default function ActiveSpellEffects({
   onEffectSelect = () => {},
 }: {
   onEffectSelect?: (effect: SpellEffect) => void;
 }) {
-  const { addedEffects } = useEnchantmentStore();
+  const { addedEffects, equipmentType, soulGem } = useEnchantmentStore();
+
+  const wornMagnitude = useMemo(() => {
+    if (equipmentType === 'Worn' && addedEffects.length > 0) {
+      return getConstantEffectMagnitude(addedEffects[0].id, soulGem);
+    }
+    return 0;
+  }, [addedEffects, soulGem, equipmentType]);
 
   return (
     <div className="relative w-full bg-inherit">
@@ -89,8 +97,10 @@ export default function ActiveSpellEffects({
 
           {/* Magnitude */}
           <span className="text-right">
-            {spellEffectDefinitionById[effect.id].availableParameters.includes('Magnitude') &&
-              `${effect.magnitude} pts`}
+            {equipmentType === 'Worn'
+              ? `${wornMagnitude} ${spellEffectDefinitionById[effect.id].unit}`
+              : spellEffectDefinitionById[effect.id].availableParameters.includes('Magnitude') &&
+                `${effect.magnitude} ${spellEffectDefinitionById[effect.id].unit}`}
           </span>
 
           {/* Area */}
@@ -115,7 +125,11 @@ export default function ActiveSpellEffects({
 
           {/* Gold Cost */}
           <span className="col-span-0 hidden text-right lg:col-span-1 lg:inline">
-            {Intl.NumberFormat().format(Math.floor(getGoldCost(effect.magickaCost)))}
+            {Intl.NumberFormat().format(
+              Math.floor(
+                getGoldCost(effect.magickaCost, spellEffectDefinitionById[effect.id].barterFactor),
+              ),
+            )}
           </span>
         </div>
       ))}
