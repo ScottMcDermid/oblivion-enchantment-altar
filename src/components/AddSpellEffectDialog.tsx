@@ -73,7 +73,7 @@ export default function SpellEffectDialog(props: {
   );
 
   const goldCost = useMemo(
-    () => getGoldCost(magickaCost, props.effectDefinition.barterFactor),
+    () => getGoldCost({ equipmentType, magickaCost, spellId: props.effectDefinition.id }),
     [magickaCost],
   );
 

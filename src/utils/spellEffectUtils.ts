@@ -1007,7 +1007,7 @@ export const spellEffectDefinitionById: Record<SpellEffectDefinitionId, SpellEff
     baseCost: 22.0,
     barterFactor: 20,
     description: 'Ability to see in the dark.',
-    availableParameters: ['Duration'],
+    availableParameters: [],
     availableEquipment: ['Worn'],
     unit: 'pts',
   },
@@ -1775,8 +1775,23 @@ export function getMagickaCost({
 }
 
 export const GOLD_MULTIPLIER = 3;
-export function getGoldCost(magickaCost: number, barterFactor: number): number {
-  return magickaCost * barterFactor;
+export function getGoldCost({
+  equipmentType,
+  magickaCost,
+  spellId,
+}: {
+  equipmentType: EquipmentType;
+  magickaCost: number;
+  spellId: SpellEffectDefinitionId;
+}): number {
+  const constantEffectOverrides: Partial<Record<SpellEffectDefinitionId, number>> = {
+    NEYE: 100,
+    WABR: 2000,
+    WAWA: 2000,
+  };
+  if (equipmentType === 'Worn' && constantEffectOverrides[spellId])
+    return constantEffectOverrides[spellId];
+  return magickaCost * spellEffectDefinitionById[spellId].barterFactor;
 }
 
 export function getMasteryFromMagickaCost(magickaCost: number): Mastery {

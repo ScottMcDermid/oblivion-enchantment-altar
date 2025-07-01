@@ -20,7 +20,7 @@ export default function EnchantmentSummary() {
       addedEffects.reduce(
         (goldCost, effect) =>
           goldCost +
-          getGoldCost(effect.magickaCost, spellEffectDefinitionById[effect.id].barterFactor),
+          getGoldCost({ equipmentType, magickaCost: effect.magickaCost, spellId: effect.id }),
         0,
       ),
     [addedEffects],

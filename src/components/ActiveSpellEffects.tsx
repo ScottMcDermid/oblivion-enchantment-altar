@@ -98,14 +98,15 @@ export default function ActiveSpellEffects({
           {/* Magnitude */}
           <span className="text-right">
             {equipmentType === 'Worn'
-              ? `${wornMagnitude} ${spellEffectDefinitionById[effect.id].unit}`
+              ? wornMagnitude > 0 && `${wornMagnitude} ${spellEffectDefinitionById[effect.id].unit}`
               : spellEffectDefinitionById[effect.id].availableParameters.includes('Magnitude') &&
                 `${effect.magnitude} ${spellEffectDefinitionById[effect.id].unit}`}
           </span>
 
           {/* Area */}
           <span className="text-right">
-            {spellEffectDefinitionById[effect.id].availableParameters.includes('Area')
+            {spellEffectDefinitionById[effect.id].availableParameters.includes('Area') &&
+            equipmentType !== 'Worn'
               ? effect.area === 0
                 ? '-'
                 : `${effect.area} ft`
@@ -115,19 +116,20 @@ export default function ActiveSpellEffects({
           {/* Duration */}
           <span className="text-right">
             {spellEffectDefinitionById[effect.id].availableParameters.includes('Duration') &&
+              equipmentType !== 'Worn' &&
               `${effect.duration}s`}
           </span>
 
           {/* Magicka Cost */}
           <span className="col-span-0 hidden text-right lg:col-span-1 lg:inline">
-            {Intl.NumberFormat().format(Math.floor(effect.magickaCost))}
+            {equipmentType !== 'Worn' && Intl.NumberFormat().format(Math.floor(effect.magickaCost))}
           </span>
 
           {/* Gold Cost */}
           <span className="col-span-0 hidden text-right lg:col-span-1 lg:inline">
             {Intl.NumberFormat().format(
               Math.floor(
-                getGoldCost(effect.magickaCost, spellEffectDefinitionById[effect.id].barterFactor),
+                getGoldCost({ equipmentType, magickaCost: effect.magickaCost, spellId: effect.id }),
               ),
             )}
           </span>
