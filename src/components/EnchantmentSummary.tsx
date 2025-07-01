@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useEnchantmentStore } from '@/data/enchantmentStore';
-import { getGoldCost, spellEffectDefinitionById } from '@/utils/spellEffectUtils';
+import { getGoldCost } from '@/utils/spellEffectUtils';
 import { Tooltip, Typography } from '@mui/material';
 import FlashOn from '@mui/icons-material/FlashOn';
 import BatteryIcon from '@mui/icons-material/Battery0Bar';
@@ -23,7 +23,7 @@ export default function EnchantmentSummary() {
           getGoldCost({ equipmentType, magickaCost: effect.magickaCost, spellId: effect.id }),
         0,
       ),
-    [addedEffects],
+    [addedEffects, equipmentType],
   );
 
   const uses = useMemo(
