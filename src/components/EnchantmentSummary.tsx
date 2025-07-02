@@ -27,48 +27,50 @@ export default function EnchantmentSummary() {
   );
 
   const uses = useMemo(
-    () => Math.floor(capacityBySoulGem[soulGem] / Math.floor(magickaCost)),
+    () => Math.floor(capacityBySoulGem[soulGem] / magickaCost),
     [magickaCost, soulGem],
   );
 
   return (
-    <div className="mt-4 w-full">
-      <div className="flex w-full justify-end gap-1 px-2 shadow-sm">
+    <div className="mt-4">
+      <div className="flex w-full flex-col items-end gap-1 px-2 shadow-sm">
         {equipmentType === 'Worn' && (
-          <div className="flex place-items-center justify-end gap-1">
-            <FlashOn fontSize="small" />
-            <div className="text-ghost">Constant Effect</div>
-          </div>
+          <Tooltip title="Magicka Cost">
+            <div className="flex place-items-center gap-1">
+              <div className="text-ghost">Constant Effect</div>
+              <FlashOn fontSize="small" />
+            </div>
+          </Tooltip>
         )}
 
         {equipmentType !== 'Worn' && (
           <Tooltip title="Magicka Cost">
-            <div className="flex place-items-center justify-end gap-1">
-              <FlashOn fontSize="small" />
+            <div className="flex place-items-center gap-1">
               <Typography
                 className="text-lg"
                 color={magickaCost > maxMagickaBySoulGem[soulGem] ? 'error' : ''}
               >
-                {Intl.NumberFormat().format(Math.floor(magickaCost))} /{' '}
-                {Intl.NumberFormat().format(Math.floor(maxMagickaBySoulGem[soulGem]))}
+                {Intl.NumberFormat().format(magickaCost)} /{' '}
+                {Intl.NumberFormat().format(maxMagickaBySoulGem[soulGem])}
               </Typography>
+              <FlashOn fontSize="small" />
             </div>
           </Tooltip>
         )}
 
         {equipmentType !== 'Worn' && (
           <Tooltip title="Uses">
-            <div className="flex min-w-20 items-center justify-end gap-1">
-              <BatteryIcon fontSize="small" />
+            <div className="flex items-center gap-1">
               <span className="text-lg">{Intl.NumberFormat().format(uses)}</span>
+              <BatteryIcon fontSize="small" />
             </div>
           </Tooltip>
         )}
 
         <Tooltip title="Gold Cost">
-          <div className="flex min-w-20 items-center justify-end gap-1">
+          <div className="flex items-center gap-1">
+            <span className="text-lg">{Intl.NumberFormat().format(goldCost)}</span>
             <AttachMoney fontSize="small" />
-            <span className="text-lg">{Intl.NumberFormat().format(Math.floor(goldCost))}</span>
           </div>
         </Tooltip>
       </div>

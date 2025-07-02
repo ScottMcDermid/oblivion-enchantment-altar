@@ -23,15 +23,32 @@ export default function ActiveSpellEffects({
   const goldCosts = useMemo(
     () =>
       addedEffects.map((effect) =>
-        Math.floor(
-          getGoldCost({
-            magickaCost: equipmentType === 'Worn' ? wornMagnitude : effect.magickaCost,
-            equipmentType,
-            spellId: effect.id,
-          }),
-        ),
+        getGoldCost({
+          magickaCost: equipmentType === 'Worn' ? wornMagnitude : effect.magickaCost,
+          equipmentType,
+          spellId: effect.id,
+        }),
       ),
-    [addedEffects, equipmentType, wornMagnitude],
+    [addedEffects, equipmentType],
+  );
+
+  const spellDefinitions = useMemo(
+    () => addedEffects.map((effect) => spellEffectDefinitionById[effect.id]),
+    [addedEffects],
+  );
+
+  const spellNames = useMemo(
+    () =>
+      addedEffects.map((effect, i) =>
+        effect.attribute
+          ? spellDefinitions[i].name.replace(/Attribute/, effect.attribute)
+          : effect.skill
+            ? spellDefinitions[i].name.replace(/Skill/, effect.skill)
+            : effect.lockLevel
+              ? `${spellDefinitions[i].name} ${effect.lockLevel} Lock`
+              : spellDefinitions[i].name,
+      ),
+    [addedEffects],
   );
 
   return (
@@ -88,39 +105,30 @@ export default function ActiveSpellEffects({
           )}
         >
           {/* Spell effect icon */}
-          <Tooltip title={spellEffectDefinitionById[effect.id].school}>
+          <Tooltip title={spellDefinitions[i].school}>
             <Image
               width={64}
               height={64}
               src={`/icons/spell-effects/${effect.id}.png`}
-              alt={spellEffectDefinitionById[effect.id].name}
+              alt={spellDefinitions[i].name}
               className="h-8 w-8 object-contain pl-1 lg:h-8 lg:w-8"
             />
           </Tooltip>
 
           {/* Spell effect name */}
-          <span className="pl-1 lg:text-lg">
-            {effect.attribute
-              ? spellEffectDefinitionById[effect.id].name.replace(/Attribute/, effect.attribute)
-              : effect.skill
-                ? spellEffectDefinitionById[effect.id].name.replace(/Skill/, effect.skill)
-                : effect.lockLevel
-                  ? `${spellEffectDefinitionById[effect.id].name} ${effect.lockLevel} Lock`
-                  : spellEffectDefinitionById[effect.id].name}
-          </span>
+          <span className="pl-1 lg:text-lg">{spellNames[i]}</span>
 
           {/* Magnitude */}
           <span className="text-right">
             {equipmentType === 'Worn'
-              ? wornMagnitude > 0 && `${wornMagnitude} ${spellEffectDefinitionById[effect.id].unit}`
-              : spellEffectDefinitionById[effect.id].availableParameters.includes('Magnitude') &&
-                `${effect.magnitude} ${spellEffectDefinitionById[effect.id].unit}`}
+              ? !spellDefinitions[i].isFlatCostConstantEffect &&
+                `${wornMagnitude} ${spellDefinitions[i].unit}`
+              : `${effect.magnitude} ${spellDefinitions[i].unit}`}
           </span>
 
           {/* Area */}
           <span className="text-right">
-            {spellEffectDefinitionById[effect.id].availableParameters.includes('Area') &&
-            equipmentType !== 'Worn'
+            {spellDefinitions[i].availableParameters.includes('Area') && equipmentType !== 'Worn'
               ? effect.area === 0
                 ? '-'
                 : `${effect.area} ft`
@@ -129,14 +137,14 @@ export default function ActiveSpellEffects({
 
           {/* Duration */}
           <span className="text-right">
-            {spellEffectDefinitionById[effect.id].availableParameters.includes('Duration') &&
+            {spellDefinitions[i].availableParameters.includes('Duration') &&
               equipmentType !== 'Worn' &&
               `${effect.duration}s`}
           </span>
 
           {/* Magicka Cost */}
           <span className="col-span-0 hidden text-right lg:col-span-1 lg:inline">
-            {equipmentType !== 'Worn' && Intl.NumberFormat().format(Math.floor(effect.magickaCost))}
+            {equipmentType !== 'Worn' && Intl.NumberFormat().format(effect.magickaCost)}
           </span>
 
           {/* Gold Cost */}

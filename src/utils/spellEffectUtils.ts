@@ -245,6 +245,7 @@ export type SpellEffectDefinition = {
   availableEquipment: EquipmentType[];
   unit: string;
   isCursedEnchantment?: boolean;
+  isFlatCostConstantEffect?: boolean;
 };
 
 export type SpellEffect = {
@@ -1024,6 +1025,7 @@ export const spellEffectDefinitionById: Record<SpellEffectDefinitionId, SpellEff
     availableParameters: [],
     availableEquipment: ['Worn'],
     unit: 'pts',
+    isFlatCostConstantEffect: true,
   },
   OPEN: {
     id: 'OPEN',
@@ -1262,6 +1264,7 @@ export const spellEffectDefinitionById: Record<SpellEffectDefinitionId, SpellEff
     availableParameters: ['Area', 'Duration'],
     availableEquipment: ['Weapon', 'Worn'],
     unit: 'pts',
+    isFlatCostConstantEffect: true,
   },
   STRP: {
     id: 'STRP',
@@ -1306,6 +1309,7 @@ export const spellEffectDefinitionById: Record<SpellEffectDefinitionId, SpellEff
     availableParameters: ['Area', 'Duration'],
     availableEquipment: ['Weapon', 'Worn'],
     unit: 'pts',
+    isFlatCostConstantEffect: true,
   },
   WAWA: {
     id: 'WAWA',
@@ -1317,6 +1321,7 @@ export const spellEffectDefinitionById: Record<SpellEffectDefinitionId, SpellEff
     availableParameters: ['Area', 'Duration'],
     availableEquipment: ['Weapon', 'Worn'],
     unit: 'pts',
+    isFlatCostConstantEffect: true,
   },
   WKDI: {
     id: 'WKDI',
@@ -1793,7 +1798,7 @@ export function getMagickaCost({
   const M = Math.max(magnitude ** 1.28, 1);
   const D = Math.max(duration, 1);
   const A = Math.max(area * 0.15, 1);
-  return Math.max(B * M * D * A, 1);
+  return Math.floor(Math.max(B * M * D * A, 1));
 }
 
 const GOLD_MULTIPLIER = 10;
