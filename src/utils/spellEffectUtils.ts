@@ -1804,6 +1804,11 @@ export function getMagickaCost({
 }
 
 const GOLD_MULTIPLIER = 10;
+const constantEffectCostOverrides: Partial<Record<SpellEffectDefinitionId, number>> = {
+  NEYE: 100,
+  WABR: 2000,
+  WAWA: 2000,
+};
 export function getGoldCost({
   equipmentType,
   soulGem,
@@ -1813,39 +1818,34 @@ export function getGoldCost({
   soulGem: SoulGem;
   effect: SpellEffect;
 }): number {
-  const constantEffectOverrides: Partial<Record<SpellEffectDefinitionId, number>> = {
-    NEYE: 100,
-    WABR: 2000,
-    WAWA: 2000,
-  };
-
-  const magnitude =
-    equipmentType === 'Worn' ? getConstantEffectMagnitude(effect.id, soulGem) : effect.magnitude;
   const definition = spellEffectDefinitionById[effect.id];
 
-  const magickaCost = getMagickaCost({
-    baseCost: definition.baseCost,
-    magnitude,
-    area: effect.area,
-    duration: effect.duration,
-  });
+  // We use a different formula for worn equipment
+  if (equipmentType !== 'Worn') {
+    const magickaCost = getMagickaCost({
+      baseCost: definition.baseCost,
+      magnitude: effect.magnitude,
+      area: effect.area,
+      duration: effect.duration,
+    });
 
-  if (equipmentType === 'Worn') {
-    // Special exceptions for some spell effects
-    if (constantEffectOverrides[effect.id]) {
-      return constantEffectOverrides[effect.id] ?? 0;
-    }
-
-    // Cursed, worn enchantments are free to craft
-    if (definition.isCursedEnchantment) {
-      return 0;
-    }
-
-    return Math.floor(magickaCost * definition.barterFactor);
+    // Weapon computation
+    return Math.floor(magickaCost * GOLD_MULTIPLIER);
   }
 
-  // Weapon computation
-  return Math.floor(magickaCost * GOLD_MULTIPLIER);
+  const magnitude = getConstantEffectMagnitude(effect.id, soulGem);
+
+  // Special exceptions for some spell effects
+  if (constantEffectCostOverrides[effect.id]) {
+    return constantEffectCostOverrides[effect.id] ?? 0;
+  }
+
+  // Cursed, worn enchantments are free to craft
+  if (definition.isCursedEnchantment) {
+    return 0;
+  }
+
+  return Math.floor(magnitude * definition.barterFactor);
 }
 
 export function getMasteryFromMagickaCost(magickaCost: number): Mastery {
