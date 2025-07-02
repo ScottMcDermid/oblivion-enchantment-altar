@@ -18,12 +18,10 @@ export default function EnchantmentSummary() {
   const goldCost = useMemo(
     () =>
       addedEffects.reduce(
-        (goldCost, effect) =>
-          goldCost +
-          getGoldCost({ equipmentType, magickaCost: effect.magickaCost, spellId: effect.id }),
+        (goldCost, effect) => goldCost + getGoldCost({ equipmentType, soulGem, effect }),
         0,
       ),
-    [addedEffects, equipmentType],
+    [addedEffects, equipmentType, soulGem],
   );
 
   const uses = useMemo(

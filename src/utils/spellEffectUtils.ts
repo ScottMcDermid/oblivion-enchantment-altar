@@ -1,3 +1,5 @@
+import { getConstantEffectMagnitude, SoulGem } from '@/utils/enchantmentUtils';
+
 export type School =
   | 'Alteration'
   | 'Conjuration'
@@ -1804,12 +1806,12 @@ export function getMagickaCost({
 const GOLD_MULTIPLIER = 10;
 export function getGoldCost({
   equipmentType,
-  magickaCost,
-  spellId,
+  soulGem,
+  effect,
 }: {
   equipmentType: EquipmentType;
-  magickaCost: number;
-  spellId: SpellEffectDefinitionId;
+  soulGem: SoulGem;
+  effect: SpellEffect;
 }): number {
   const constantEffectOverrides: Partial<Record<SpellEffectDefinitionId, number>> = {
     NEYE: 100,
@@ -1817,18 +1819,29 @@ export function getGoldCost({
     WAWA: 2000,
   };
 
+  const magnitude =
+    equipmentType === 'Worn' ? getConstantEffectMagnitude(effect.id, soulGem) : effect.magnitude;
+  const definition = spellEffectDefinitionById[effect.id];
+
+  const magickaCost = getMagickaCost({
+    baseCost: definition.baseCost,
+    magnitude,
+    area: effect.area,
+    duration: effect.duration,
+  });
+
   if (equipmentType === 'Worn') {
     // Special exceptions for some spell effects
-    if (constantEffectOverrides[spellId]) {
-      return constantEffectOverrides[spellId];
+    if (constantEffectOverrides[effect.id]) {
+      return constantEffectOverrides[effect.id] ?? 0;
     }
 
     // Cursed, worn enchantments are free to craft
-    if (spellEffectDefinitionById[spellId].isCursedEnchantment) {
+    if (definition.isCursedEnchantment) {
       return 0;
     }
 
-    return Math.floor(magickaCost * spellEffectDefinitionById[spellId].barterFactor);
+    return Math.floor(magickaCost * definition.barterFactor);
   }
 
   // Weapon computation

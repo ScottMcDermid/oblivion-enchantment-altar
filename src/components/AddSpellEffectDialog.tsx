@@ -73,8 +73,19 @@ export default function SpellEffectDialog(props: {
   );
 
   const goldCost = useMemo(
-    () => getGoldCost({ equipmentType, magickaCost, spellId: props.effectDefinition.id }),
-    [magickaCost, equipmentType, props.effectDefinition.id],
+    () =>
+      getGoldCost({
+        equipmentType,
+        effect: {
+          id: props.effectDefinition.id,
+          magnitude,
+          magickaCost,
+          area,
+          duration,
+        },
+        soulGem,
+      }),
+    [magickaCost, equipmentType, props.effectDefinition.id, soulGem, magnitude, area, duration],
   );
 
   useEffect(() => {

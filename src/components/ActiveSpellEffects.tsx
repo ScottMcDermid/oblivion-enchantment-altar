@@ -24,12 +24,12 @@ export default function ActiveSpellEffects({
     () =>
       addedEffects.map((effect) =>
         getGoldCost({
-          magickaCost: equipmentType === 'Worn' ? wornMagnitude : effect.magickaCost,
+          effect,
           equipmentType,
-          spellId: effect.id,
+          soulGem,
         }),
       ),
-    [addedEffects, equipmentType],
+    [addedEffects, equipmentType, soulGem],
   );
 
   const spellDefinitions = useMemo(
@@ -48,7 +48,7 @@ export default function ActiveSpellEffects({
               ? `${spellDefinitions[i].name} ${effect.lockLevel} Lock`
               : spellDefinitions[i].name,
       ),
-    [addedEffects],
+    [addedEffects, spellDefinitions],
   );
 
   return (
