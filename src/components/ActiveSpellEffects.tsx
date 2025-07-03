@@ -13,12 +13,15 @@ export default function ActiveSpellEffects({
 }) {
   const { addedEffects, equipmentType, soulGem } = useEnchantmentStore();
 
-  const wornMagnitude = useMemo(() => {
-    if (equipmentType === 'Worn' && addedEffects.length > 0) {
-      return getConstantEffectMagnitude(addedEffects[0].id, soulGem);
-    }
-    return 0;
-  }, [addedEffects, soulGem, equipmentType]);
+  const magnitudes = useMemo(
+    () =>
+      addedEffects.map((effect) =>
+        equipmentType === 'Worn'
+          ? getConstantEffectMagnitude(effect.id, soulGem)
+          : effect.magnitude,
+      ),
+    [equipmentType, addedEffects, soulGem],
+  );
 
   const goldCosts = useMemo(
     () =>
@@ -120,10 +123,16 @@ export default function ActiveSpellEffects({
 
           {/* Magnitude */}
           <span className="text-right">
-            {equipmentType === 'Worn'
-              ? !spellDefinitions[i].isFlatCostConstantEffect &&
-                `${wornMagnitude} ${spellDefinitions[i].unit}`
-              : `${effect.magnitude} ${spellDefinitions[i].unit}`}
+            {spellDefinitions[i].availableParameters.includes('Magnitude') &&
+            spellDefinitions[i].isLevelBasedMagnitude ? (
+              <span>
+                {spellDefinitions[i].unit} {magnitudes[i]}
+              </span>
+            ) : (
+              <span>
+                {magnitudes[i]} {spellDefinitions[i].unit}
+              </span>
+            )}
           </span>
 
           {/* Area */}

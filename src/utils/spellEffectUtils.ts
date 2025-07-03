@@ -1793,6 +1793,9 @@ export const weaponSpellEffectDefinitions = spellEffectDefinitions.filter((effec
   effect.availableEquipment.includes('Weapon'),
 );
 
+// https://en.uesp.net/wiki/Oblivion:Magical_Effects#Magnitude_to_Level_Conversion
+const LEVEL_TO_MAGNITUDE_MULTIPLIER = 4;
+
 // https://en.uesp.net/wiki/Oblivion:Spell_Making#Spell_Cost
 export function getMagickaCost({
   baseCost,
@@ -1808,7 +1811,7 @@ export function getMagickaCost({
   isLevelBasedMagnitude?: boolean;
 }): number {
   const adjustedMagnitude = isLevelBasedMagnitude
-    ? (magnitude / MAX_LEVEL_MAGNITUDE) * MAX_MAGNITUDE
+    ? magnitude * LEVEL_TO_MAGNITUDE_MULTIPLIER
     : magnitude;
   const B = baseCost / 10;
   const M = Math.max(adjustedMagnitude ** 1.28, 1);

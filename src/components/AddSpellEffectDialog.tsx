@@ -105,7 +105,9 @@ export default function SpellEffectDialog(props: {
         props.effectDefinition.availableParameters.includes('Magnitude')
           ? equipmentType === 'Worn'
             ? getConstantEffectMagnitude(props.effectDefinition.id, soulGem)
-            : MIN_MAGNITUDE
+            : props.effectDefinition.isLevelBasedMagnitude
+              ? MIN_LEVEL_MAGNITUDE
+              : MIN_MAGNITUDE
           : 0,
       );
       setArea(0);
@@ -184,9 +186,15 @@ export default function SpellEffectDialog(props: {
             <div>
               <div className="mb-1 flex justify-between">
                 <label>Magnitude</label>
-                <span>
-                  {magnitude} {props.effectDefinition.unit}
-                </span>
+                {props.effectDefinition.isLevelBasedMagnitude ? (
+                  <span>
+                    {props.effectDefinition.unit} {magnitude}
+                  </span>
+                ) : (
+                  <span>
+                    {magnitude} {props.effectDefinition.unit}
+                  </span>
+                )}
               </div>
               <Slider
                 value={magnitude}
@@ -205,7 +213,7 @@ export default function SpellEffectDialog(props: {
             <div>
               <div className="mb-1 flex justify-between">
                 <label>Area</label>
-                <span>{area} ft</span>
+                <span>{area > 0 ? `${area} ft` : '-'}</span>
               </div>
               <Slider
                 value={area}
