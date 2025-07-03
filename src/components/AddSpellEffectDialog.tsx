@@ -33,6 +33,8 @@ import {
   skills as selectableSkills,
   Attribute,
   Skill,
+  MAX_LEVEL_MAGNITUDE,
+  MIN_LEVEL_MAGNITUDE,
 } from '@/utils/spellEffectUtils';
 
 import { useEnchantmentStore } from '@/data/enchantmentStore';
@@ -65,6 +67,7 @@ export default function SpellEffectDialog(props: {
     () =>
       getMagickaCost({
         baseCost: props.effectDefinition.baseCost,
+        isLevelBasedMagnitude: props.effectDefinition.isLevelBasedMagnitude,
         magnitude,
         area,
         duration,
@@ -181,14 +184,20 @@ export default function SpellEffectDialog(props: {
             <div>
               <div className="mb-1 flex justify-between">
                 <label>Magnitude</label>
-                <span>{magnitude} pts</span>
+                <span>
+                  {magnitude} {props.effectDefinition.unit}
+                </span>
               </div>
               <Slider
                 value={magnitude}
                 aria-label="Magnitude"
                 onChange={(_, val) => setMagnitude(val as number)}
-                min={MIN_MAGNITUDE}
-                max={MAX_MAGNITUDE}
+                min={
+                  props.effectDefinition.isLevelBasedMagnitude ? MIN_LEVEL_MAGNITUDE : MIN_MAGNITUDE
+                }
+                max={
+                  props.effectDefinition.isLevelBasedMagnitude ? MAX_LEVEL_MAGNITUDE : MAX_MAGNITUDE
+                }
               />
             </div>
           )}
