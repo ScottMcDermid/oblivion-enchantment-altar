@@ -72,7 +72,13 @@ export default function SpellEffectDialog(props: {
         area,
         duration,
       }),
-    [props.effectDefinition.baseCost, magnitude, area, duration],
+    [
+      props.effectDefinition.baseCost,
+      props.effectDefinition.isLevelBasedMagnitude,
+      magnitude,
+      area,
+      duration,
+    ],
   );
 
   const goldCost = useMemo(
