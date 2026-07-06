@@ -104,7 +104,7 @@ export default function SpellEffectSelector({
       </div>
 
       <div className="min-h-0 flex-1">
-        <div className="h-full space-y-2 overflow-y-auto rounded-md border border-[#2e2e2e] p-2">
+        <div className="h-full space-y-1 overflow-y-auto rounded-md border border-[#2e2e2e] p-1.5">
           {filteredEffects.map((effect) => (
             <Button
               key={effect.id}
@@ -116,17 +116,17 @@ export default function SpellEffectSelector({
               }}
               className="justify-start text-left normal-case"
             >
-              <div className="flex items-center gap-3 p-1">
+              <div className="flex items-center gap-2 p-0.5">
                 <Tooltip title={effect.school}>
                   <Image
                     src={`/icons/spell-effects/${effect.id}.png`}
                     width={64}
                     height={64}
                     alt={effect.name}
-                    className="h-10 w-10 lg:h-16 lg:w-16"
+                    className="h-7 w-7 lg:h-9 lg:w-9"
                   />
                 </Tooltip>
-                <span className="flex-1 text-lg">{effect.name}</span>
+                <span className="flex-1 text-sm lg:text-base">{effect.name}</span>
               </div>
             </Button>
           ))}
