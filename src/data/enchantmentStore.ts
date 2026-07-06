@@ -2,7 +2,7 @@ import type { EquipmentType, SpellEffect } from '@/utils/spellEffectUtils';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { upsert } from '@/utils/array';
-import { SoulGem } from '@/utils/enchantmentUtils';
+import { type SoulGem } from '@/utils/enchantmentUtils';
 
 type State = {
   addedEffects: SpellEffect[];
@@ -17,6 +17,11 @@ type Action = {
   resetEnchantment: () => void;
   toggleEquipmentType: () => void;
   setSoulGem: (soulGem: SoulGem) => void;
+  loadEnchantment: (data: {
+    addedEffects: SpellEffect[];
+    equipmentType: EquipmentType;
+    soulGem: SoulGem;
+  }) => void;
 };
 
 type EnchantmentStore = State & { actions: Action };
@@ -51,6 +56,13 @@ const useEnchantmentStore = create<EnchantmentStore>()(
           setSoulGem: (soulGem) => set(() => ({ soulGem })),
           resetEnchantment: () => {
             set(() => ({ addedEffects: [] }));
+          },
+          loadEnchantment: (data) => {
+            set(() => ({
+              addedEffects: data.addedEffects,
+              equipmentType: data.equipmentType,
+              soulGem: data.soulGem,
+            }));
           },
         },
       };
