@@ -7,6 +7,44 @@ import { cn } from '@/utils/cn';
 import { getConstantEffectMagnitude } from '@/utils/enchantmentUtils';
 import SpellEffectEditor from '@/components/SpellEffectEditor';
 
+const SKELETON_ROWS = [
+  { nameWidth: 'w-3/4' },
+  { nameWidth: 'w-1/2' },
+  { nameWidth: 'w-2/3' },
+];
+
+export function EffectsSkeleton() {
+  return (
+    <div className="relative w-full animate-pulse bg-inherit">
+      {/* Header skeleton */}
+      <div className="grid grid-cols-[2rem_minmax(0,1fr)_4rem_4rem_4rem] items-center py-2 pb-2 pr-2 pt-6 lg:grid-cols-[2rem_minmax(0,1fr)_6rem_4rem_6rem_6rem_6rem]">
+        <span />
+        <span />
+        <div className="ml-auto h-3 w-10 rounded bg-[#2e2e2e]" />
+        <div className="ml-auto h-3 w-8 rounded bg-[#2e2e2e]" />
+        <div className="ml-auto h-3 w-8 rounded bg-[#2e2e2e]" />
+        <div className="ml-auto hidden h-3 w-12 rounded bg-[#2e2e2e] lg:block" />
+        <div className="ml-auto hidden h-3 w-10 rounded bg-[#2e2e2e] lg:block" />
+      </div>
+      {/* Placeholder rows */}
+      {SKELETON_ROWS.map((row, i) => (
+        <div
+          key={i}
+          className="grid grid-cols-[2rem_minmax(0,1fr)_4rem_4rem_4rem] items-center py-2 pl-1 pr-2 lg:grid-cols-[2rem_minmax(0,1fr)_6rem_4rem_6rem_6rem_6rem]"
+        >
+          <div className="ml-1 h-6 w-6 rounded bg-[#2e2e2e]" />
+          <div className={cn('ml-1 h-4 rounded bg-[#2e2e2e]', row.nameWidth)} />
+          <div className="ml-auto h-3 w-8 rounded bg-[#2e2e2e]" />
+          <div className="ml-auto h-3 w-6 rounded bg-[#2e2e2e]" />
+          <div className="ml-auto h-3 w-6 rounded bg-[#2e2e2e]" />
+          <div className="ml-auto hidden h-3 w-10 rounded bg-[#2e2e2e] lg:block" />
+          <div className="ml-auto hidden h-3 w-8 rounded bg-[#2e2e2e] lg:block" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function ActiveSpellEffects({
   expandedEffectId,
   onToggleExpand,

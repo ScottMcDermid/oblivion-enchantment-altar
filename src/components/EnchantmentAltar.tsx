@@ -25,9 +25,11 @@ import {
 } from '@/utils/spellEffectUtils';
 
 import { useEnchantmentStore } from '@/data/enchantmentStore';
-import ActiveSpellEffects from '@/components/ActiveSpellEffects';
+import ActiveSpellEffects, { EffectsSkeleton } from '@/components/ActiveSpellEffects';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { SoulGemSelector } from '@/components/SoulGemSelector';
+import { useHydrated } from '@/hooks/useHydrated';
+import { cn } from '@/utils/cn';
 
 function createDefaultEffect(definition: SpellEffectDefinition) {
   const magnitude = definition.availableParameters.includes('Magnitude')
@@ -68,6 +70,7 @@ export default function EnchantmentAltar({ sharedEnchantment }: { sharedEnchantm
     actions: { addSpellEffect, resetEnchantment, removeSpellEffect, toggleEquipmentType, loadEnchantment },
   } = useEnchantmentStore();
   const { copyShareUrl } = useShareEnchantment();
+  const hydrated = useHydrated();
   const [expandedEffectId, setExpandedEffectId] = useState<string | null>(null);
   const [isConfirmingReset, setIsConfirmingReset] = useState(false);
   const [isConfirmingEquipmentToggle, setIsConfirmingEquipmentToggle] = useState(false);
@@ -198,20 +201,38 @@ export default function EnchantmentAltar({ sharedEnchantment }: { sharedEnchantm
               </div>
             )}
 
-            <div className={`mt-3 max-h-80 flex-1 bg-inherit sm:max-h-full lg:max-w-full ${isViewOnly ? 'mx-auto max-w-4xl' : ''}`}>
+            <div className={cn(
+              'mt-3 max-h-80 flex-1 bg-inherit sm:max-h-full lg:max-w-full',
+              isViewOnly && 'mx-auto max-w-4xl',
+            )}>
               <SoulGemSelector />
-              <ActiveSpellEffects
-                expandedEffectId={isViewOnly ? null : expandedEffectId}
-                onToggleExpand={isViewOnly ? () => {} : (id) => {
-                  if (equipmentType === 'Worn') {
-                    removeSpellEffect(
-                      addedEffects.find((e) => e.id === id)!,
-                    );
-                    return;
-                  }
-                  setExpandedEffectId((prev) => (prev === id ? null : id));
-                }}
-              />
+              {isViewOnly ? (
+                <ActiveSpellEffects
+                  expandedEffectId={null}
+                  onToggleExpand={() => {}}
+                />
+              ) : (
+                <>
+                  {!hydrated && <EffectsSkeleton />}
+                  <div className={cn(
+                    'transition-opacity duration-200',
+                    hydrated ? 'opacity-100' : 'h-0 overflow-hidden opacity-0',
+                  )}>
+                    <ActiveSpellEffects
+                      expandedEffectId={expandedEffectId}
+                      onToggleExpand={(id) => {
+                        if (equipmentType === 'Worn') {
+                          removeSpellEffect(
+                            addedEffects.find((e) => e.id === id)!,
+                          );
+                          return;
+                        }
+                        setExpandedEffectId((prev) => (prev === id ? null : id));
+                      }}
+                    />
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>
