@@ -61,7 +61,7 @@ export function SoulGemSelector() {
           <LinearProgress
             variant="determinate"
             value={progressValue}
-            color={!isWorn && isOverBudget ? 'error' : !isWorn && magickaCost === maxMagicka ? 'success' : 'secondary'}
+            color={!isWorn && isOverBudget ? 'error' : (isWorn && hasEffects) || (!isWorn && magickaCost === maxMagicka) ? 'success' : 'secondary'}
             className="flex-1"
             sx={{ height: 8, borderRadius: 1 }}
           />
