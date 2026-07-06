@@ -1,8 +1,11 @@
 import React, { useMemo } from 'react';
 import { LinearProgress, ToggleButton, ToggleButtonGroup, Tooltip } from '@mui/material';
 import FlashOn from '@mui/icons-material/FlashOn';
-import { maxMagickaBySoulGem, soulGems } from '@/utils/enchantmentUtils';
+import BatteryIcon from '@mui/icons-material/Battery0Bar';
+import AttachMoney from '@mui/icons-material/AttachMoney';
+import { capacityBySoulGem, maxMagickaBySoulGem, soulGems } from '@/utils/enchantmentUtils';
 import { useEnchantmentStore } from '@/data/enchantmentStore';
+import { getGoldCost } from '@/utils/spellEffectUtils';
 
 export function SoulGemSelector() {
   const {
@@ -17,13 +20,29 @@ export function SoulGemSelector() {
     [addedEffects],
   );
 
+  const goldCost = useMemo(
+    () =>
+      addedEffects.reduce(
+        (total, effect) => total + getGoldCost({ equipmentType, soulGem, effect }),
+        0,
+      ),
+    [addedEffects, equipmentType, soulGem],
+  );
+
+  const uses = useMemo(
+    () => Math.floor(capacityBySoulGem[soulGem] / magickaCost),
+    [magickaCost, soulGem],
+  );
+
   const maxMagicka = maxMagickaBySoulGem[soulGem];
   const isOverBudget = magickaCost > maxMagicka;
   const isWorn = equipmentType === 'Worn';
   const progressValue = isWorn ? 100 : Math.min((magickaCost / maxMagicka) * 100, 100);
+  const hasEffects = addedEffects.length > 0;
 
   return (
-    <div>
+    <div className="mb-4 rounded-md border border-[#2e2e2e] bg-[#1a1a1a] px-3 py-3">
+      <div className="text-sm text-ghost text-center">Soul Gem</div>
       <ToggleButtonGroup
         value={soulGem}
         exclusive
@@ -38,11 +57,11 @@ export function SoulGemSelector() {
       </ToggleButtonGroup>
 
       <Tooltip title="Magicka Cost">
-        <div className="mb-4 flex items-center gap-2 px-1">
+        <div className="flex items-center gap-2 px-1">
           <LinearProgress
             variant="determinate"
             value={progressValue}
-            color={!isWorn && isOverBudget ? 'error' : 'secondary'}
+            color={!isWorn && isOverBudget ? 'error' : !isWorn && magickaCost === maxMagicka ? 'success' : 'secondary'}
             className="flex-1"
             sx={{ height: 8, borderRadius: 1 }}
           />
@@ -60,6 +79,26 @@ export function SoulGemSelector() {
           </div>
         </div>
       </Tooltip>
+
+      {hasEffects && (
+        <div className="mt-2 flex items-center justify-end gap-4 px-1 text-sm text-gray-300">
+          {!isWorn && (
+            <Tooltip title="Uses">
+              <div className="flex items-center gap-1">
+                <span>{Intl.NumberFormat().format(uses)}</span>
+                <BatteryIcon fontSize="small" />
+              </div>
+            </Tooltip>
+          )}
+
+          <Tooltip title="Gold Cost">
+            <div className="flex items-center gap-1">
+              <span>{Intl.NumberFormat().format(goldCost)}</span>
+              <AttachMoney fontSize="small" />
+            </div>
+          </Tooltip>
+        </div>
+      )}
     </div>
   );
 }

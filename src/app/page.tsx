@@ -23,7 +23,6 @@ import {
 
 import { useEnchantmentStore } from '@/data/enchantmentStore';
 import ActiveSpellEffects from '@/components/ActiveSpellEffects';
-import EnchantmentSummary from '@/components/EnchantmentSummary';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { SoulGemSelector } from '@/components/SoulGemSelector';
 
@@ -150,7 +149,6 @@ export default function Home() {
                   setExpandedEffectId((prev) => (prev === id ? null : id));
                 }}
               />
-              <div className="mt-3">{addedEffects.length > 0 && <EnchantmentSummary />}</div>
             </div>
           </div>
         </div>
