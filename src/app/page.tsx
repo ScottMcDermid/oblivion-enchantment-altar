@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { Button, StyledEngineProvider } from '@mui/material';
@@ -9,10 +9,15 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 import theme from '@/app/theme';
 
 import SpellEffectSelector from '@/components/SpellEffectSelector';
-import AddSpellEffectDialog from '@/components/AddSpellEffectDialog';
 import {
-  SpellEffect,
-  spellEffectDefinitionById,
+  getMagickaCost,
+  MIN_DURATION,
+  MIN_MAGNITUDE,
+  MIN_LEVEL_MAGNITUDE,
+  lockLevels,
+  magnitudeByLockLevel,
+  attributes,
+  skills as selectableSkills,
   type SpellEffectDefinition,
 } from '@/utils/spellEffectUtils';
 
@@ -22,21 +27,51 @@ import EnchantmentSummary from '@/components/EnchantmentSummary';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { SoulGemSelector } from '@/components/SoulGemSelector';
 
+function createDefaultEffect(definition: SpellEffectDefinition) {
+  const magnitude = definition.availableParameters.includes('Magnitude')
+    ? definition.selectableLockLevel
+      ? magnitudeByLockLevel[lockLevels[0]]
+      : definition.isLevelBasedMagnitude
+        ? MIN_LEVEL_MAGNITUDE
+        : MIN_MAGNITUDE
+    : 0;
+  const area = 0;
+  const duration = definition.availableParameters.includes('Duration') ? MIN_DURATION : 0;
+
+  const magickaCost = getMagickaCost({
+    baseCost: definition.baseCost,
+    isLevelBasedMagnitude: definition.isLevelBasedMagnitude,
+    magnitude,
+    area,
+    duration,
+  });
+
+  return {
+    id: definition.id,
+    magnitude,
+    area,
+    duration,
+    magickaCost,
+    ...(definition.selectableAttribute && { attribute: attributes[0] }),
+    ...(definition.selectableSkill && { skill: selectableSkills[0] }),
+    ...(definition.selectableLockLevel && { lockLevel: lockLevels[0] }),
+  };
+}
+
 export default function Home() {
   const {
     addedEffects,
     equipmentType,
     actions: { addSpellEffect, resetEnchantment, removeSpellEffect, toggleEquipmentType },
   } = useEnchantmentStore();
-  const [isAddSpellEffectOpen, setIsAddSpellEffectOpen] = useState(false);
+  const [expandedEffectId, setExpandedEffectId] = useState<string | null>(null);
   const [isConfirmingReset, setIsConfirmingReset] = useState(false);
   const [isConfirmingEquipmentToggle, setIsConfirmingEquipmentToggle] = useState(false);
-  const [editEffect, setEditEffect] = useState<SpellEffect | null>(null);
-  const [selectedEffect, setSelectedEffect] = useState<SpellEffectDefinition | null>(null);
 
   const handleReset = (confirm: boolean) => {
     if (confirm) {
       resetEnchantment();
+      setExpandedEffectId(null);
     }
     setIsConfirmingReset(false);
   };
@@ -44,13 +79,10 @@ export default function Home() {
   const handleEquipmentToggle = (confirm: boolean) => {
     if (confirm) {
       toggleEquipmentType();
+      setExpandedEffectId(null);
     }
     setIsConfirmingEquipmentToggle(false);
   };
-
-  useEffect(() => {
-    if (!isAddSpellEffectOpen) setEditEffect(null);
-  }, [isAddSpellEffectOpen]);
 
   return (
     <StyledEngineProvider injectFirst>
@@ -81,16 +113,19 @@ export default function Home() {
             <div className="flex min-h-0 flex-1 flex-shrink-0 flex-col sm:max-w-80">
               <SpellEffectSelector
                 onEffectSelect={(effect) => {
-                  if (equipmentType === 'Worn')
-                    return addSpellEffect({
+                  if (equipmentType === 'Worn') {
+                    addSpellEffect({
                       id: effect.id,
                       magickaCost: effect.baseCost,
                       magnitude: 0,
                       area: 0,
                       duration: 0,
                     });
-                  setSelectedEffect(effect);
-                  setIsAddSpellEffectOpen(true);
+                    return;
+                  }
+                  const defaultEffect = createDefaultEffect(effect);
+                  addSpellEffect(defaultEffect);
+                  setExpandedEffectId(effect.id);
                 }}
                 equipmentType={equipmentType}
                 onEquipmentTypeChange={() =>
@@ -104,11 +139,15 @@ export default function Home() {
             <div className="mt-3 max-h-80 flex-1 bg-inherit sm:max-h-full lg:max-w-full">
               <SoulGemSelector />
               <ActiveSpellEffects
-                onEffectSelect={(effect) => {
-                  if (equipmentType === 'Worn') return removeSpellEffect(effect);
-                  setSelectedEffect(spellEffectDefinitionById[effect.id]);
-                  setEditEffect(effect);
-                  setIsAddSpellEffectOpen(true);
+                expandedEffectId={expandedEffectId}
+                onToggleExpand={(id) => {
+                  if (equipmentType === 'Worn') {
+                    removeSpellEffect(
+                      addedEffects.find((e) => e.id === id)!,
+                    );
+                    return;
+                  }
+                  setExpandedEffectId((prev) => (prev === id ? null : id));
                 }}
               />
               <div className="mt-3">{addedEffects.length > 0 && <EnchantmentSummary />}</div>
@@ -147,19 +186,6 @@ export default function Home() {
             <span>GitHub</span>
           </a>
         </footer>
-
-        {selectedEffect && (
-          <AddSpellEffectDialog
-            effectDefinition={selectedEffect}
-            open={isAddSpellEffectOpen}
-            {...(editEffect && { effect: editEffect })}
-            onClose={() => setIsAddSpellEffectOpen(false)}
-            onSpellEffectConfirmed={(effect) => {
-              addSpellEffect(effect);
-              setIsAddSpellEffectOpen(false);
-            }}
-          />
-        )}
 
         <ConfirmDialog
           open={isConfirmingReset}

@@ -1,15 +1,18 @@
 import React, { useMemo } from 'react';
 import { useEnchantmentStore } from '@/data/enchantmentStore';
 import Image from 'next/image';
-import { getGoldCost, SpellEffect, spellEffectDefinitionById } from '@/utils/spellEffectUtils';
+import { getGoldCost, spellEffectDefinitionById } from '@/utils/spellEffectUtils';
 import { Tooltip } from '@mui/material';
 import { cn } from '@/utils/cn';
 import { getConstantEffectMagnitude } from '@/utils/enchantmentUtils';
+import SpellEffectEditor from '@/components/SpellEffectEditor';
 
 export default function ActiveSpellEffects({
-  onEffectSelect = () => {},
+  expandedEffectId,
+  onToggleExpand,
 }: {
-  onEffectSelect?: (effect: SpellEffect) => void;
+  expandedEffectId: string | null;
+  onToggleExpand: (id: string) => void;
 }) {
   const { addedEffects, equipmentType, soulGem } = useEnchantmentStore();
 
@@ -86,82 +89,100 @@ export default function ActiveSpellEffects({
 
         {/* Gold */}
         <span className="col-span-0 hidden text-right lg:col-span-1 lg:inline">Gold</span>
-
-        {/* Actions*/}
-        <span></span>
       </div>
       {addedEffects.length === 0 && (
         <div className="items-center px-2 py-2 text-sm">No Active Effects</div>
       )}
 
-      {addedEffects.map((effect, i) => (
-        <div
-          key={effect.id}
-          role="button"
-          tabIndex={0}
-          onClick={() => onEffectSelect(effect)}
-          onKeyDown={(e) => e.key === 'Enter' && onEffectSelect(effect)}
-          className={cn(
-            'grid items-center py-2 pr-2 text-sm hover:bg-[#2f2f2f]',
-            'grid-cols-[2rem_minmax(0,1fr)_4rem_4rem_4rem]',
-            'lg:grid-cols-[2rem_minmax(0,1fr)_6rem_4rem_6rem_6rem_6rem]',
-          )}
-        >
-          {/* Spell effect icon */}
-          <Tooltip title={spellDefinitions[i].school}>
-            <Image
-              width={64}
-              height={64}
-              src={`/icons/spell-effects/${effect.id}.png`}
-              alt={spellDefinitions[i].name}
-              className="h-8 w-8 object-contain pl-1 lg:h-8 lg:w-8"
-            />
-          </Tooltip>
+      {addedEffects.map((effect, i) => {
+        const isExpanded = expandedEffectId === effect.id;
+        const definition = spellDefinitions[i];
 
-          {/* Spell effect name */}
-          <span className="pl-1 lg:text-lg">{spellNames[i]}</span>
+        return (
+          <div key={effect.id}>
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={() => onToggleExpand(effect.id)}
+              onKeyDown={(e) => e.key === 'Enter' && onToggleExpand(effect.id)}
+              className={cn(
+                'grid items-center py-2 pr-2 text-sm cursor-pointer hover:bg-[#2f2f2f]',
+                'grid-cols-[2rem_minmax(0,1fr)_4rem_4rem_4rem]',
+                'lg:grid-cols-[2rem_minmax(0,1fr)_6rem_4rem_6rem_6rem_6rem]',
+                isExpanded ? 'border-l-4 border-l-yellow-400' : 'pl-1',
+              )}
+            >
+              {/* Spell effect icon */}
+              <Tooltip title={definition.school}>
+                <Image
+                  width={64}
+                  height={64}
+                  src={`/icons/spell-effects/${effect.id}.png`}
+                  alt={definition.name}
+                  className="h-8 w-8 object-contain pl-1 lg:h-8 lg:w-8"
+                />
+              </Tooltip>
 
-          {/* Magnitude */}
-          <span className="text-right">
-            {spellDefinitions[i].availableParameters.includes('Magnitude') &&
-            spellDefinitions[i].isLevelBasedMagnitude ? (
-              <span>
-                {spellDefinitions[i].unit} {magnitudes[i]}
+              {/* Spell effect name */}
+              <span className="pl-1 lg:text-lg">{spellNames[i]}</span>
+
+              {/* Magnitude */}
+              <span className="text-right">
+                {definition.availableParameters.includes('Magnitude') &&
+                definition.isLevelBasedMagnitude ? (
+                  <span>
+                    {definition.unit} {magnitudes[i]}
+                  </span>
+                ) : (
+                  <span>
+                    {magnitudes[i]} {definition.unit}
+                  </span>
+                )}
               </span>
-            ) : (
-              <span>
-                {magnitudes[i]} {spellDefinitions[i].unit}
+
+              {/* Area */}
+              <span className="text-right">
+                {definition.availableParameters.includes('Area') && equipmentType !== 'Worn'
+                  ? effect.area === 0
+                    ? '-'
+                    : `${effect.area} ft`
+                  : ''}
               </span>
+
+              {/* Duration */}
+              <span className="text-right">
+                {definition.availableParameters.includes('Duration') &&
+                  equipmentType !== 'Worn' &&
+                  `${effect.duration}s`}
+              </span>
+
+              {/* Magicka Cost */}
+              <span className="col-span-0 hidden text-right lg:col-span-1 lg:inline">
+                {equipmentType !== 'Worn' && Intl.NumberFormat().format(effect.magickaCost)}
+              </span>
+
+              {/* Gold Cost */}
+              <span className="col-span-0 hidden text-right lg:col-span-1 lg:inline">
+                {Intl.NumberFormat().format(goldCosts[i])}
+              </span>
+            </div>
+
+            {/* Inline editor panel */}
+            {equipmentType !== 'Worn' && (
+              <div
+                className={cn(
+                  'grid transition-[grid-template-rows,opacity] duration-300 ease-in-out',
+                  isExpanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0',
+                )}
+              >
+                <div className="min-h-0 overflow-hidden">
+                  <SpellEffectEditor effect={effect} effectDefinition={definition} />
+                </div>
+              </div>
             )}
-          </span>
-
-          {/* Area */}
-          <span className="text-right">
-            {spellDefinitions[i].availableParameters.includes('Area') && equipmentType !== 'Worn'
-              ? effect.area === 0
-                ? '-'
-                : `${effect.area} ft`
-              : ''}
-          </span>
-
-          {/* Duration */}
-          <span className="text-right">
-            {spellDefinitions[i].availableParameters.includes('Duration') &&
-              equipmentType !== 'Worn' &&
-              `${effect.duration}s`}
-          </span>
-
-          {/* Magicka Cost */}
-          <span className="col-span-0 hidden text-right lg:col-span-1 lg:inline">
-            {equipmentType !== 'Worn' && Intl.NumberFormat().format(effect.magickaCost)}
-          </span>
-
-          {/* Gold Cost */}
-          <span className="col-span-0 hidden text-right lg:col-span-1 lg:inline">
-            {Intl.NumberFormat().format(goldCosts[i])}
-          </span>
-        </div>
-      ))}
+          </div>
+        );
+      })}
     </div>
   );
 }
