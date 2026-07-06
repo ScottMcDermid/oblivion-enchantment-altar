@@ -1,15 +1,29 @@
 import React, { useMemo, useState } from 'react';
-import { TextField, Button, Tooltip, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import { TextField, Button, Chip, Tooltip, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import Image from 'next/image';
+import type { IconType } from 'react-icons';
+import { FaBriefcaseMedical, FaEye, FaFeather, FaFireAlt } from 'react-icons/fa';
+import { GiDevilMask, GiDominoMask } from 'react-icons/gi';
 
 import {
   equipmentTypes,
+  schools,
   weaponSpellEffectDefinitions,
   wornSpellEffectDefinitions,
   type EquipmentType,
+  type School,
   type SpellEffectDefinition,
 } from '@/utils/spellEffectUtils';
 import { useEnchantmentStore } from '@/data/enchantmentStore';
+
+const schoolIcons: Record<School, IconType> = {
+  Alteration: FaFeather,
+  Conjuration: GiDevilMask,
+  Destruction: FaFireAlt,
+  Illusion: GiDominoMask,
+  Mysticism: FaEye,
+  Restoration: FaBriefcaseMedical,
+};
 
 export default function SpellEffectSelector({
   onEffectSelect,
@@ -21,6 +35,7 @@ export default function SpellEffectSelector({
   onEquipmentTypeChange: (type: EquipmentType) => void;
 }) {
   const [search, setSearch] = useState('');
+  const [schoolFilter, setSchoolFilter] = useState<School | null>(null);
 
   const { addedEffects } = useEnchantmentStore();
 
@@ -37,7 +52,8 @@ export default function SpellEffectSelector({
     const addedSpellEffectIds = addedEffects.map((effect) => effect.id);
     return (
       effect.name.toLowerCase().includes(search.toLowerCase()) &&
-      !addedSpellEffectIds.includes(effect.id)
+      !addedSpellEffectIds.includes(effect.id) &&
+      (schoolFilter === null || effect.school === schoolFilter)
     );
   });
 
@@ -66,8 +82,26 @@ export default function SpellEffectSelector({
         fullWidth
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        className="mb-4 px-2"
+        className="mb-2 px-2"
       />
+
+      <div className="mb-2 flex flex-wrap gap-1 px-2">
+        {schools.map((school) => {
+          const Icon = schoolIcons[school];
+          return (
+            <Chip
+              key={school}
+              icon={<Icon className="!text-xs" />}
+              label={school}
+              size="small"
+              variant={schoolFilter === school ? 'filled' : 'outlined'}
+              color={schoolFilter === school ? 'primary' : 'default'}
+              onClick={() => setSchoolFilter(schoolFilter === school ? null : school)}
+              className="text-xs"
+            />
+          );
+        })}
+      </div>
 
       <div className="min-h-0 flex-1">
         <div className="h-full space-y-2 overflow-y-auto rounded-md border border-[#2e2e2e] p-2">
