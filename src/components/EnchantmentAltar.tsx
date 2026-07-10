@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import { Button, Snackbar, StyledEngineProvider } from '@mui/material';
+import { AppBar, Box, Button, Snackbar, StyledEngineProvider, Toolbar, Typography } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ShareIcon from '@mui/icons-material/Share';
 import GitHubIcon from '@mui/icons-material/GitHub';
@@ -139,38 +139,45 @@ export default function EnchantmentAltar({ sharedEnchantment }: { sharedEnchantm
           </div>
         )}
 
-        <h1 className="absolute w-screen text-center text-lg">Oblivion Enchantment Altar</h1>
-        <div className="max-w-screen m-auto flex h-screen max-h-screen max-w-6xl flex-col bg-inherit">
-          {/* Title */}
-
-          {/* Nav bar */}
-          <div className="z-20 flex h-12 w-full flex-row justify-between px-2 pt-6 sm:pt-2">
+        <AppBar position="static" sx={{ backgroundColor: 'background.paper' }} elevation={1}>
+          <Toolbar variant="dense" sx={{ gap: 1, overflow: 'hidden' }}>
+            <Typography
+              variant="h6"
+              noWrap
+              sx={{ fontSize: '1rem', fontWeight: 'bold', color: 'secondary.main' }}
+            >
+              Oblivion Enchantment Altar
+            </Typography>
+            <Box sx={{ flex: 1 }} />
             {!isViewOnly && (
-              <div className="flex place-items-center">
+              <>
                 {addedEffects.length > 0 && (
                   <>
                     <Button
-                      className="mx-2"
+                      size="small"
                       color="error"
                       aria-label="Reset Enchantment"
                       onClick={() => setIsConfirmingReset(true)}
                     >
-                      <DeleteIcon />
-                      <div className="hidden sm:block">&nbsp;Reset</div>
+                      <DeleteIcon fontSize="small" />
+                      <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' }, ml: 0.5 }}>Reset</Box>
                     </Button>
                     <Button
+                      size="small"
                       aria-label="Share Enchantment"
                       onClick={handleShare}
                     >
-                      <ShareIcon />
-                      <div className="hidden sm:block">&nbsp;Share</div>
+                      <ShareIcon fontSize="small" />
+                      <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' }, ml: 0.5 }}>Share</Box>
                     </Button>
                   </>
                 )}
-              </div>
+              </>
             )}
-          </div>
+          </Toolbar>
+        </AppBar>
 
+        <Box sx={{ minHeight: 'calc(100vh - 48px)', display: 'flex', flexDirection: 'column' }}>
           <div className="flex w-full flex-1 flex-col justify-center gap-6 overflow-y-auto bg-inherit sm:flex-row">
             {/* Spell effect selector (hidden in view-only mode) */}
             {!isViewOnly && (
@@ -235,7 +242,7 @@ export default function EnchantmentAltar({ sharedEnchantment }: { sharedEnchantm
               )}
             </div>
           </div>
-        </div>
+        </Box>
         <footer className="relative mt-16 w-full border-t border-gray-700 bg-neutral-900 px-6 py-8 text-sm text-gray-400">
           <div className="mx-auto max-w-4xl space-y-2 text-center">
             <p>Oblivion Tool Suite © 2025 Scott McDermid</p>
