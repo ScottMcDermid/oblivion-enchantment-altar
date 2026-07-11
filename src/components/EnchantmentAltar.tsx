@@ -223,7 +223,7 @@ export default function EnchantmentAltar({ sharedEnchantment }: { sharedEnchantm
               {isViewOnly ? (
                 <>
                   {sharedEnchantment?.name && (
-                    <h2 className="mb-4 text-2xl font-semibold text-gray-100">
+                    <h2 className="mb-4 text-center text-2xl font-semibold text-gray-100">
                       {sharedEnchantment.name}
                     </h2>
                   )}
