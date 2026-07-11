@@ -184,8 +184,8 @@ export default function EnchantmentAltar({ sharedEnchantment }: { sharedEnchantm
           </Toolbar>
         </AppBar>
 
-        <Box sx={{ minHeight: 'calc(100vh - 48px)', display: 'flex', flexDirection: 'column' }}>
-          <div className="flex w-full flex-1 flex-col justify-center gap-6 overflow-y-auto bg-inherit sm:flex-row">
+        <Box sx={{ height: 'calc(100vh - 48px)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+          <div className="flex h-full w-full flex-col gap-6 overflow-hidden bg-inherit sm:flex-row">
             {/* Spell effect selector (hidden in view-only mode) */}
             {!isViewOnly && (
               <div className="flex min-h-0 flex-1 flex-shrink-0 flex-col sm:max-w-80">
@@ -216,7 +216,7 @@ export default function EnchantmentAltar({ sharedEnchantment }: { sharedEnchantm
             )}
 
             <div className={cn(
-              'mt-3 max-h-80 flex-1 bg-inherit sm:max-h-full lg:max-w-full',
+              'flex h-full flex-1 flex-col overflow-y-auto bg-inherit lg:max-w-full',
               isViewOnly && 'mx-auto max-w-4xl',
             )}>
               <SoulGemSelector />
