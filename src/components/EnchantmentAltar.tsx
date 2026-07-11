@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import { AppBar, Box, Button, InputAdornment, Snackbar, StyledEngineProvider, TextField, Toolbar, Typography } from '@mui/material';
+import { AppBar, Box, Button, IconButton, InputAdornment, Snackbar, StyledEngineProvider, TextField, Toolbar, Typography } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ShareIcon from '@mui/icons-material/Share';
 import GitHubIcon from '@mui/icons-material/GitHub';
@@ -148,6 +148,15 @@ export default function EnchantmentAltar({ sharedEnchantment }: { sharedEnchantm
 
         <AppBar position="static" sx={{ backgroundColor: 'background.paper' }} elevation={1}>
           <Toolbar variant="dense" sx={{ gap: 1, overflow: 'hidden' }}>
+            <IconButton
+              component="a"
+              href="https://oblivion.tools"
+              size="small"
+              aria-label="Oblivion Tools home"
+              sx={{ p: 0.5 }}
+            >
+              <img src="/oblivion-tools-icon.ico" alt="Oblivion Tools" width={16} height={16} style={{ display: 'block' }} />
+            </IconButton>
             <Typography
               variant="h6"
               noWrap
