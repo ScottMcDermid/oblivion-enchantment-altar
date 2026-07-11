@@ -19,6 +19,10 @@
  *       - if set: 5 bits skill index (0-20)
  *       - 1 bit: has lock level flag
  *       - if set: 3 bits lock level index (0-4)
+ *
+ * Encoding format (v2): all of v1, plus after all effects:
+ *   - 1 bit: has name flag
+ *   - if set: 7 bits name length, then (length × 7) bits of 7-bit ASCII chars
  */
 
 import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';
@@ -39,7 +43,8 @@ import {
 
 import { type SoulGem, soulGems } from '@/utils/enchantmentUtils';
 
-const CODEC_VERSION = 1;
+const CODEC_VERSION = 2;
+const MAX_ITEM_NAME_LENGTH = 64;
 
 const equipmentTypes: EquipmentType[] = ['Weapon', 'Worn'];
 
@@ -109,6 +114,7 @@ export interface EnchantmentData {
   equipmentType: EquipmentType;
   soulGem: SoulGem;
   effects: SpellEffect[];
+  name?: string;
 }
 
 // ─── Encode ─────────────────────────────────────────────────────────────────
@@ -175,6 +181,19 @@ export function encodeEnchantment(data: EnchantmentData): string {
     }
   }
 
+  // Name (v2: 1 flag bit, then 7-bit length + 7 bits per ASCII char)
+  const rawName = (data.name ?? '').slice(0, MAX_ITEM_NAME_LENGTH);
+  const name = rawName.replace(/[^\x20-\x7E]/g, '');
+  if (name.length > 0) {
+    writer.writeBits(1, 1);
+    writer.writeBits(name.length, 7);
+    for (let i = 0; i < name.length; i++) {
+      writer.writeBits(name.charCodeAt(i), 7);
+    }
+  } else {
+    writer.writeBits(0, 1);
+  }
+
   // Compress
   const bytes = writer.toUint8Array();
   const binaryString = String.fromCharCode.apply(null, Array.from(bytes));
@@ -197,7 +216,7 @@ export function decodeEnchantment(code: string): EnchantmentData | null {
 
     // Version
     const version = reader.readBits(8);
-    if (version !== 1) return null;
+    if (version !== 1 && version !== 2) return null;
 
     // Equipment type
     const equipmentTypeIdx = reader.readBits(1);
@@ -272,7 +291,21 @@ export function decodeEnchantment(code: string): EnchantmentData | null {
       });
     }
 
-    return { equipmentType, soulGem, effects };
+    // Name (v2 only)
+    let name: string | undefined;
+    if (version === 2) {
+      const hasName = reader.readBits(1);
+      if (hasName) {
+        const nameLength = reader.readBits(7);
+        let decoded = '';
+        for (let i = 0; i < nameLength; i++) {
+          decoded += String.fromCharCode(reader.readBits(7));
+        }
+        name = decoded;
+      }
+    }
+
+    return { equipmentType, soulGem, effects, ...(name !== undefined && { name }) };
   } catch {
     return null;
   }

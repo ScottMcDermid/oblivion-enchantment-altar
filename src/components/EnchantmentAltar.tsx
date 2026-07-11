@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import { AppBar, Box, Button, Snackbar, StyledEngineProvider, Toolbar, Typography } from '@mui/material';
+import { AppBar, Box, Button, InputAdornment, Snackbar, StyledEngineProvider, TextField, Toolbar, Typography } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import ShareIcon from '@mui/icons-material/Share';
 import GitHubIcon from '@mui/icons-material/GitHub';
@@ -62,12 +62,15 @@ function createDefaultEffect(definition: SpellEffectDefinition) {
   };
 }
 
+const MAX_ITEM_NAME_LENGTH = 64;
+
 export default function EnchantmentAltar({ sharedEnchantment }: { sharedEnchantment?: EnchantmentData }) {
   const isViewOnly = !!sharedEnchantment;
   const {
     addedEffects,
     equipmentType,
-    actions: { addSpellEffect, resetEnchantment, removeSpellEffect, toggleEquipmentType, loadEnchantment },
+    itemName,
+    actions: { addSpellEffect, resetEnchantment, removeSpellEffect, toggleEquipmentType, loadEnchantment, setItemName },
   } = useEnchantmentStore();
   const { copyShareUrl } = useShareEnchantment();
   const hydrated = useHydrated();
@@ -116,7 +119,11 @@ export default function EnchantmentAltar({ sharedEnchantment }: { sharedEnchantm
         {/* Shared enchantment banner */}
         {isViewOnly && (
           <div className="sticky top-0 z-30 flex flex-wrap items-center justify-between gap-2 bg-yellow-900/80 px-4 py-2 text-sm text-yellow-200">
-            <span>Viewing a shared enchantment</span>
+            <span>
+              {sharedEnchantment?.name
+                ? <><b>Viewing: </b><strong>{sharedEnchantment.name}</strong></>
+                : 'Viewing a shared enchantment'}
+            </span>
             <div className="flex gap-2">
               <Button
                 size="small"
@@ -214,10 +221,17 @@ export default function EnchantmentAltar({ sharedEnchantment }: { sharedEnchantm
             )}>
               <SoulGemSelector />
               {isViewOnly ? (
-                <ActiveSpellEffects
-                  expandedEffectId={null}
-                  onToggleExpand={() => {}}
-                />
+                <>
+                  {sharedEnchantment?.name && (
+                    <h2 className="mb-4 text-2xl font-semibold text-gray-100">
+                      {sharedEnchantment.name}
+                    </h2>
+                  )}
+                  <ActiveSpellEffects
+                    expandedEffectId={null}
+                    onToggleExpand={() => {}}
+                  />
+                </>
               ) : (
                 <>
                   {!hydrated && <EffectsSkeleton />}
@@ -225,6 +239,28 @@ export default function EnchantmentAltar({ sharedEnchantment }: { sharedEnchantm
                     'transition-opacity duration-200',
                     hydrated ? 'opacity-100' : 'h-0 overflow-hidden opacity-0',
                   )}>
+                    <div className="mb-4">
+                      <TextField
+                        fullWidth
+                        variant="outlined"
+                        size="small"
+                        placeholder="Unnamed Item"
+                        label="Item Name"
+                        value={itemName}
+                        onChange={(e) => setItemName(e.target.value.slice(0, MAX_ITEM_NAME_LENGTH))}
+                        slotProps={{
+                          input: {
+                            endAdornment: (
+                              <InputAdornment position="end">
+                                <span className="text-xs text-gray-500">
+                                  {itemName.length}/{MAX_ITEM_NAME_LENGTH}
+                                </span>
+                              </InputAdornment>
+                            ),
+                          },
+                        }}
+                      />
+                    </div>
                     <ActiveSpellEffects
                       expandedEffectId={expandedEffectId}
                       onToggleExpand={(id) => {

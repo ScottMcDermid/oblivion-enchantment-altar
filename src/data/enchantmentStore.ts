@@ -8,6 +8,7 @@ type State = {
   addedEffects: SpellEffect[];
   equipmentType: EquipmentType;
   soulGem: SoulGem;
+  itemName: string;
   version: number;
 };
 
@@ -17,10 +18,12 @@ type Action = {
   resetEnchantment: () => void;
   toggleEquipmentType: () => void;
   setSoulGem: (soulGem: SoulGem) => void;
+  setItemName: (name: string) => void;
   loadEnchantment: (data: {
     addedEffects: SpellEffect[];
     equipmentType: EquipmentType;
     soulGem: SoulGem;
+    itemName?: string;
   }) => void;
 };
 
@@ -33,6 +36,7 @@ const useEnchantmentStore = create<EnchantmentStore>()(
         addedEffects: [],
         equipmentType: 'Weapon',
         soulGem: 'Grand',
+        itemName: '',
         version: 1,
         actions: {
           addSpellEffect: (effect) =>
@@ -54,14 +58,16 @@ const useEnchantmentStore = create<EnchantmentStore>()(
               addedEffects: [],
             })),
           setSoulGem: (soulGem) => set(() => ({ soulGem })),
+          setItemName: (itemName) => set(() => ({ itemName })),
           resetEnchantment: () => {
-            set(() => ({ addedEffects: [] }));
+            set(() => ({ addedEffects: [], itemName: '' }));
           },
           loadEnchantment: (data) => {
             set(() => ({
               addedEffects: data.addedEffects,
               equipmentType: data.equipmentType,
               soulGem: data.soulGem,
+              itemName: data.itemName ?? '',
             }));
           },
         },
@@ -76,6 +82,7 @@ const useEnchantmentStore = create<EnchantmentStore>()(
       partialize: (state) => ({
         addedEffects: state.addedEffects,
         equipmentType: state.equipmentType,
+        itemName: state.itemName,
         version: state.version,
       }),
     },

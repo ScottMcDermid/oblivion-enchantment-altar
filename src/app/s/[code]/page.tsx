@@ -30,6 +30,7 @@ export default function SharedEnchantmentPage() {
       addedEffects: enchantment.effects,
       equipmentType: enchantment.equipmentType,
       soulGem: enchantment.soulGem,
+      itemName: enchantment.name ?? '',
     });
   }, [params.code, loadEnchantment]);
 
