@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { AppBar, Box, Button, IconButton, InputAdornment, Snackbar, StyledEngineProvider, TextField, Toolbar, Typography } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import ShareIcon from '@mui/icons-material/Share';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import theme from '@/app/theme';
@@ -171,20 +171,22 @@ export default function EnchantmentAltar({ sharedEnchantment }: { sharedEnchantm
                   <>
                     <Button
                       size="small"
-                      color="error"
-                      aria-label="Reset Enchantment"
-                      onClick={() => setIsConfirmingReset(true)}
-                    >
-                      <DeleteIcon fontSize="small" />
-                      <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' }, ml: 0.5 }}>Reset</Box>
-                    </Button>
-                    <Button
-                      size="small"
                       aria-label="Share Enchantment"
                       onClick={handleShare}
+                      sx={{ minWidth: 0, px: { xs: '6px', sm: undefined } }}
                     >
                       <ShareIcon fontSize="small" />
                       <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' }, ml: 0.5 }}>Share</Box>
+                    </Button>
+                    <Button
+                      size="small"
+                      color="error"
+                      aria-label="Reset Enchantment"
+                      onClick={() => setIsConfirmingReset(true)}
+                      sx={{ minWidth: 0, px: { xs: '6px', sm: undefined } }}
+                    >
+                      <RestartAltIcon fontSize="small" />
+                      <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' }, ml: 0.5 }}>Reset</Box>
                     </Button>
                   </>
                 )}
