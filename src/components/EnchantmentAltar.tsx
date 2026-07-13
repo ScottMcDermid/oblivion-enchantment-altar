@@ -195,11 +195,11 @@ export default function EnchantmentAltar({ sharedEnchantment }: { sharedEnchantm
           </Toolbar>
         </AppBar>
 
-        <Box sx={{ height: 'calc(100vh - 48px)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-          <div className="flex h-full w-full flex-col gap-6 overflow-hidden bg-inherit sm:flex-row">
+        <Box sx={{ display: 'flex', flexDirection: 'column', '@media (min-width: 600px)': { height: 'calc(100vh - 48px)', overflow: 'hidden' } }}>
+          <div className="flex w-full flex-col gap-6 bg-inherit sm:h-full sm:overflow-hidden sm:flex-row">
             {/* Spell effect selector (hidden in view-only mode) */}
             {!isViewOnly && (
-              <div className="flex min-h-0 flex-1 flex-shrink-0 flex-col sm:max-w-80">
+              <div className="flex h-[50vh] min-h-0 flex-shrink-0 flex-col sm:h-full sm:flex-1 sm:max-w-80">
                 <SpellEffectSelector
                   onEffectSelect={(effect) => {
                     if (equipmentType === 'Worn') {
@@ -227,7 +227,7 @@ export default function EnchantmentAltar({ sharedEnchantment }: { sharedEnchantm
             )}
 
             <div className={cn(
-              'flex h-full flex-1 flex-col overflow-y-auto bg-inherit lg:max-w-full',
+              'flex flex-1 flex-col bg-inherit sm:h-full sm:overflow-y-auto lg:max-w-full',
               isViewOnly && 'mx-auto max-w-4xl',
             )}>
               <SoulGemSelector />
