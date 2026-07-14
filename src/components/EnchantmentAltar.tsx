@@ -195,11 +195,12 @@ export default function EnchantmentAltar({ sharedEnchantment }: { sharedEnchantm
           </Toolbar>
         </AppBar>
 
-        <Box sx={{ display: 'flex', flexDirection: 'column', '@media (min-width: 600px)': { height: 'calc(100vh - 48px)', overflow: 'hidden' } }}>
-          <div className="flex w-full flex-col gap-6 bg-inherit sm:h-full sm:overflow-hidden sm:flex-row">
+        <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: 'calc(100vh - 48px)' }}>
+          <Box sx={{ mx: 'auto', width: '100%', maxWidth: '72rem', px: 2 }}>
+          <div className="flex w-full flex-1 flex-col gap-6 bg-inherit pt-4 sm:flex-row">
             {/* Spell effect selector (hidden in view-only mode) */}
             {!isViewOnly && (
-              <div className="flex h-[50vh] min-h-0 flex-shrink-0 flex-col sm:h-full sm:flex-1 sm:max-w-80">
+              <div className="flex max-h-80 overflow-y-auto flex-shrink-0 flex-col sm:sticky sm:top-14 sm:overflow-visible sm:max-h-[calc(100vh-3.5rem)] sm:max-w-80">
                 <SpellEffectSelector
                   onEffectSelect={(effect) => {
                     if (equipmentType === 'Worn') {
@@ -227,7 +228,7 @@ export default function EnchantmentAltar({ sharedEnchantment }: { sharedEnchantm
             )}
 
             <div className={cn(
-              'flex flex-1 flex-col bg-inherit sm:h-full sm:overflow-y-auto lg:max-w-full',
+              'mt-3 flex-1 bg-inherit lg:max-w-full',
               isViewOnly && 'mx-auto max-w-4xl',
             )}>
               <SoulGemSelector />
@@ -289,6 +290,7 @@ export default function EnchantmentAltar({ sharedEnchantment }: { sharedEnchantm
               )}
             </div>
           </div>
+          </Box>
         </Box>
         <footer className="mt-16 w-full border-t border-gray-700 bg-neutral-900 px-6 py-8 text-sm text-gray-400">
           <div className="mx-auto flex w-full max-w-4xl flex-col gap-4 text-center sm:text-left">
