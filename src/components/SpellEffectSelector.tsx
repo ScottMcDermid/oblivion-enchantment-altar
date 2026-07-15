@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
-import { TextField, Button, Chip, Tooltip, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import { TextField, Button, Chip, Tooltip, ToggleButton, ToggleButtonGroup, InputAdornment, Box } from '@mui/material';
+import { Search } from '@mui/icons-material';
 import Image from 'next/image';
 import type { IconType } from 'react-icons';
 import { FaBriefcaseMedical, FaEye, FaFeather, FaFireAlt } from 'react-icons/fa';
@@ -75,15 +76,28 @@ export default function SpellEffectSelector({
         </ToggleButtonGroup>
       </div>
 
-      <TextField
-        label="Search Effects"
-        variant="outlined"
-        size="small"
-        fullWidth
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        className="mb-2 px-2"
-      />
+      <Box sx={{ px: 1, pb: 1 }}>
+        <TextField
+          placeholder="Search effects..."
+          variant="outlined"
+          size="small"
+          fullWidth
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <Search sx={{ fontSize: 18, color: '#fff' }} />
+              </InputAdornment>
+            ),
+          }}
+          sx={{
+            '& .MuiOutlinedInput-root': {
+              fontSize: '0.85rem',
+            },
+          }}
+        />
+      </Box>
 
       <div className="mb-2 flex flex-wrap gap-1 px-2">
         {schools.map((school) => {
