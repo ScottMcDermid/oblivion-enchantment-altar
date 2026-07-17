@@ -281,7 +281,7 @@ export default function EnchantmentAltar({ sharedEnchantment }: { sharedEnchantm
               'mt-3 flex-1 bg-inherit lg:max-w-full',
               isViewOnly && 'mx-auto max-w-4xl',
             )}>
-              {sigilStoneId ? <SigilStoneTierSlider /> : <SoulGemSelector />}
+              {(sigilStoneId !== null || showSigilStones) ? <SigilStoneTierSlider /> : <SoulGemSelector />}
               {isViewOnly ? (
                 <>
                   {sharedEnchantment?.name && (
