@@ -269,6 +269,8 @@ export default function EnchantmentAltar({ sharedEnchantment }: { sharedEnchantm
                       : toggleEquipmentType()
                   }
                   showSigilStones={showSigilStones}
+                  onModeChange={(next) => handleModeChange(next ? 'sigil-stones' : 'effects')}
+                  sigilStonesAvailable={sigilStonesAvailable}
                   schoolFilter={schoolFilter}
                   onToggleFilterDrawer={() => setFilterDrawerOpen((prev) => !prev)}
                 />

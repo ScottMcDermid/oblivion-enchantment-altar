@@ -14,6 +14,7 @@ import {
 import { Search } from '@mui/icons-material';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import Image from 'next/image';
+import { GiBroadsword, GiChestArmor, GiCrystalBall, GiSpellBook } from 'react-icons/gi';
 
 import {
   equipmentTypes,
@@ -31,6 +32,8 @@ export default function SpellEffectSelector({
   equipmentType,
   onEquipmentTypeChange,
   showSigilStones,
+  onModeChange,
+  sigilStonesAvailable,
   schoolFilter,
   onToggleFilterDrawer,
 }: {
@@ -38,6 +41,8 @@ export default function SpellEffectSelector({
   equipmentType: EquipmentType;
   onEquipmentTypeChange: (type: EquipmentType) => void;
   showSigilStones: boolean;
+  onModeChange: (showSigilStones: boolean) => void;
+  sigilStonesAvailable: boolean;
   schoolFilter: School | null;
   onToggleFilterDrawer: () => void;
 }) {
@@ -79,20 +84,52 @@ export default function SpellEffectSelector({
   return (
     <div className="flex h-full flex-col">
       {/* Equipment type toggle */}
-      <div className="flex flex-col place-items-center">
-        <div className="text-sm text-ghost">Equipment</div>
+      <div className="mb-3 flex flex-col place-items-center">
+        <div className="mb-1 text-xs font-semibold uppercase tracking-wider text-gray-400">Equipment</div>
         <ToggleButtonGroup
           exclusive
+          fullWidth
           value={equipmentType}
           onChange={(_e, type) => type !== null && onEquipmentTypeChange(type)}
-          className="m-auto mb-4"
+          size="small"
         >
           {equipmentTypes.map((type) => (
-            <ToggleButton key={type} value={type} className="min-w-14 py-1 sm:min-w-32">
+            <ToggleButton key={type} value={type} className="normal-case gap-1.5 py-1.5">
+              {type === 'Weapon' ? <GiBroadsword className="text-base" /> : <GiChestArmor className="text-base" />}
               {type}
             </ToggleButton>
           ))}
         </ToggleButtonGroup>
+      </div>
+
+      {/* Effects / Sigil Stones toggle */}
+      <div className="mb-3 flex flex-col place-items-center">
+        <div className="mb-1 text-xs font-semibold uppercase tracking-wider text-gray-400">Type</div>
+        <ToggleButtonGroup
+          exclusive
+          fullWidth
+          value={showSigilStones ? 'sigil-stones' : 'effects'}
+          onChange={(_e, val) => val !== null && onModeChange(val === 'sigil-stones')}
+          size="small"
+        >
+          <ToggleButton value="effects" className="normal-case gap-1.5 py-1.5">
+            <GiSpellBook className="text-base" />
+            Effects
+          </ToggleButton>
+          <ToggleButton
+            value="sigil-stones"
+            disabled={!sigilStonesAvailable}
+            className="normal-case gap-1.5 py-1.5"
+          >
+            <GiCrystalBall className="text-base" />
+            Sigil Stones
+          </ToggleButton>
+        </ToggleButtonGroup>
+        {!sigilStonesAvailable && (
+          <p className="mt-1.5 w-full text-[11px] text-gray-500">
+            Remove active effects to use sigil stones.
+          </p>
+        )}
       </div>
 
       {/* Search field + filter button */}
