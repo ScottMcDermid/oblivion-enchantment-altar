@@ -150,8 +150,8 @@ export default function ActiveSpellEffects({
           <Image
             width={64}
             height={64}
-            src="/icons/sigil-stone.png"
-            alt="Sigil Stone"
+            src={`/icons/spell-effects/${effectId}.png`}
+            alt={getSigilStoneEffectName(sigilStone, side)}
             className="h-8 w-8 object-contain pl-1"
           />
           <div className="flex flex-col pl-1">

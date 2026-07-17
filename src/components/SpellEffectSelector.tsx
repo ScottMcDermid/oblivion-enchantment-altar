@@ -149,10 +149,10 @@ export default function SpellEffectSelector({
                   >
                     <div className="flex items-center gap-2 p-0.5">
                       <Image
-                        src="/icons/sigil-stone.png"
+                        src={`/icons/spell-effects/${equipmentType === 'Weapon' ? stone.weaponEffectId : stone.wornEffectId}.png`}
                         width={64}
                         height={64}
-                        alt="Sigil Stone"
+                        alt={getSigilStoneEffectName(stone, equipmentType === 'Weapon' ? 'weapon' : 'worn')}
                         className="h-7 w-7 flex-shrink-0 object-contain lg:h-9 lg:w-9"
                       />
                       <div className="flex flex-col">
