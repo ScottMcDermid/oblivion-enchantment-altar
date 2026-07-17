@@ -10,6 +10,7 @@ import {
   getSigilStoneDefinitionById,
   getSigilStoneEffectName,
   getSigilStoneTierIndex,
+  getSigilStoneValues,
 } from '@/utils/sigilStoneUtils';
 
 const SKELETON_ROWS = [
@@ -57,7 +58,7 @@ export default function ActiveSpellEffects({
   expandedEffectId: string | null;
   onToggleExpand: (id: string) => void;
 }) {
-  const { addedEffects, equipmentType, soulGem, sigilStoneId, sigilStoneTier } =
+  const { addedEffects, equipmentType, soulGem, sigilStoneId, sigilStoneTier, sigilStonePatchEnabled } =
     useEnchantmentStore();
 
   // ── All hooks must be called unconditionally ────────────────────────────────
@@ -121,7 +122,7 @@ export default function ActiveSpellEffects({
     let displayLabel: string;
 
     if (equipmentType === 'Weapon') {
-      const val = sigilStone.weaponValues[sigilTierIndex];
+      const val = getSigilStoneValues(sigilStone, 'weapon', sigilStonePatchEnabled)[sigilTierIndex];
       if (sigilStone.weaponValueIsDuration) {
         displayValue = `${val}s`;
         displayLabel = 'Duration';
@@ -130,7 +131,7 @@ export default function ActiveSpellEffects({
         displayLabel = 'Magnitude';
       }
     } else {
-      const mag = sigilStone.wornMagnitudes[sigilTierIndex];
+      const mag = getSigilStoneValues(sigilStone, 'worn', sigilStonePatchEnabled)[sigilTierIndex];
       displayValue = mag === 0 ? '—' : `${mag} ${definition.unit}`;
       displayLabel = 'Magnitude';
     }

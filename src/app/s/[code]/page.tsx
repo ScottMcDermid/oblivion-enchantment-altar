@@ -33,6 +33,7 @@ export default function SharedEnchantmentPage() {
       itemName: enchantment.name ?? '',
       sigilStoneId: enchantment.sigilStoneId ?? null,
       sigilStoneTier: enchantment.sigilStoneTier,
+      sigilStonePatchEnabled: enchantment.sigilStonePatchEnabled,
     });
   }, [params.code, loadEnchantment]);
 

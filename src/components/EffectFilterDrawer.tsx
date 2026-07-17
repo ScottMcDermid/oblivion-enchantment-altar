@@ -39,12 +39,16 @@ function FiltersContent({
   schoolFilter,
   onSchoolFilterChange,
   sigilStonesAvailable,
+  sigilStonePatchEnabled,
+  onSigilStonePatchChange,
 }: {
   mode: Mode;
   onModeChange: (mode: Mode) => void;
   schoolFilter: School | null;
   onSchoolFilterChange: (school: School | null) => void;
   sigilStonesAvailable: boolean;
+  sigilStonePatchEnabled: boolean;
+  onSigilStonePatchChange: (enabled: boolean) => void;
 }) {
   return (
     <div className="space-y-4 p-4">
@@ -105,6 +109,32 @@ function FiltersContent({
           </div>
         </div>
       )}
+
+      {/* Vanilla / Patched toggle — only in Sigil Stones mode */}
+      {mode === 'sigil-stones' && (
+        <div>
+          <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
+            Values
+          </div>
+          <ToggleButtonGroup
+            exclusive
+            fullWidth
+            value={sigilStonePatchEnabled ? 'patched' : 'vanilla'}
+            onChange={(_e, val) => val !== null && onSigilStonePatchChange(val === 'patched')}
+            size="small"
+          >
+            <ToggleButton value="vanilla" className="normal-case py-1.5">
+              Vanilla
+            </ToggleButton>
+            <ToggleButton value="patched" className="normal-case py-1.5">
+              Patched
+            </ToggleButton>
+          </ToggleButtonGroup>
+          <p className="mt-1.5 text-[11px] text-gray-500">
+            Patched fixes erroneous values corrected by the Unofficial Oblivion Patch and Remastered.
+          </p>
+        </div>
+      )}
     </div>
   );
 }
@@ -117,6 +147,8 @@ export default function EffectFilterDrawer({
   schoolFilter,
   onSchoolFilterChange,
   sigilStonesAvailable,
+  sigilStonePatchEnabled,
+  onSigilStonePatchChange,
 }: {
   open: boolean;
   onClose: () => void;
@@ -125,10 +157,12 @@ export default function EffectFilterDrawer({
   schoolFilter: School | null;
   onSchoolFilterChange: (school: School | null) => void;
   sigilStonesAvailable: boolean;
+  sigilStonePatchEnabled: boolean;
+  onSigilStonePatchChange: (enabled: boolean) => void;
 }) {
   const isDesktop = useMediaQuery('(min-width: 1280px)', { defaultMatches: false });
 
-  const sharedProps = { mode, onModeChange, schoolFilter, onSchoolFilterChange, sigilStonesAvailable };
+  const sharedProps = { mode, onModeChange, schoolFilter, onSchoolFilterChange, sigilStonesAvailable, sigilStonePatchEnabled, onSigilStonePatchChange };
 
   // ── Desktop: MUI persistent Drawer ─────────────────────────────────────────
   if (isDesktop) {

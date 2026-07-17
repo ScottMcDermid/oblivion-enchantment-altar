@@ -15,6 +15,7 @@ export function useShareEnchantment() {
   const itemName = useEnchantmentStore((s) => s.itemName);
   const sigilStoneId = useEnchantmentStore((s) => s.sigilStoneId);
   const sigilStoneTier = useEnchantmentStore((s) => s.sigilStoneTier);
+  const sigilStonePatchEnabled = useEnchantmentStore((s) => s.sigilStonePatchEnabled);
 
   const getShareUrl = useCallback((): string => {
     const enchantmentData: EnchantmentData = {
@@ -24,12 +25,13 @@ export function useShareEnchantment() {
       name: itemName || undefined,
       sigilStoneId: sigilStoneId || undefined,
       sigilStoneTier: sigilStoneId ? sigilStoneTier : undefined,
+      sigilStonePatchEnabled: sigilStoneId ? sigilStonePatchEnabled : undefined,
     };
 
     const code = encodeEnchantment(enchantmentData);
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
     return `${origin}/s/${code}`;
-  }, [addedEffects, equipmentType, soulGem, itemName, sigilStoneId, sigilStoneTier]);
+  }, [addedEffects, equipmentType, soulGem, itemName, sigilStoneId, sigilStoneTier, sigilStonePatchEnabled]);
 
   const copyShareUrl = useCallback(async (): Promise<boolean> => {
     try {

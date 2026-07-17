@@ -74,7 +74,8 @@ export default function EnchantmentAltar({ sharedEnchantment }: { sharedEnchantm
     equipmentType,
     itemName,
     sigilStoneId,
-    actions: { addSpellEffect, resetEnchantment, removeSpellEffect, toggleEquipmentType, loadEnchantment, setItemName, setSigilStone },
+    sigilStonePatchEnabled,
+    actions: { addSpellEffect, resetEnchantment, removeSpellEffect, toggleEquipmentType, loadEnchantment, setItemName, setSigilStone, setSigilStonePatchEnabled },
   } = useEnchantmentStore();
   const { copyShareUrl } = useShareEnchantment();
   const hydrated = useHydrated();
@@ -129,6 +130,7 @@ export default function EnchantmentAltar({ sharedEnchantment }: { sharedEnchantm
       soulGem: sharedEnchantment.soulGem,
       sigilStoneId: sharedEnchantment.sigilStoneId ?? null,
       sigilStoneTier: sharedEnchantment.sigilStoneTier,
+      sigilStonePatchEnabled: sharedEnchantment.sigilStonePatchEnabled,
     });
     setSnackbarMessage('Enchantment copied to your altar!');
     window.location.href = '/';
@@ -233,6 +235,8 @@ export default function EnchantmentAltar({ sharedEnchantment }: { sharedEnchantm
               schoolFilter={schoolFilter}
               onSchoolFilterChange={setSchoolFilter}
               sigilStonesAvailable={sigilStonesAvailable}
+              sigilStonePatchEnabled={sigilStonePatchEnabled}
+              onSigilStonePatchChange={setSigilStonePatchEnabled}
             />
           )}
 

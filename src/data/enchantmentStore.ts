@@ -13,6 +13,7 @@ type State = {
   version: number;
   sigilStoneId: string | null;
   sigilStoneTier: SigilStoneTier;
+  sigilStonePatchEnabled: boolean;
 };
 
 type Action = {
@@ -24,6 +25,7 @@ type Action = {
   setItemName: (name: string) => void;
   setSigilStone: (id: string | null) => void;
   setSigilStoneTier: (tier: SigilStoneTier) => void;
+  setSigilStonePatchEnabled: (enabled: boolean) => void;
   loadEnchantment: (data: {
     addedEffects: SpellEffect[];
     equipmentType: EquipmentType;
@@ -31,6 +33,7 @@ type Action = {
     itemName?: string;
     sigilStoneId?: string | null;
     sigilStoneTier?: SigilStoneTier;
+    sigilStonePatchEnabled?: boolean;
   }) => void;
 };
 
@@ -47,6 +50,7 @@ const useEnchantmentStore = create<EnchantmentStore>()(
         version: 1,
         sigilStoneId: null,
         sigilStoneTier: 'Transcendent',
+        sigilStonePatchEnabled: true,
         actions: {
           addSpellEffect: (effect) =>
             set((state) => ({
@@ -77,6 +81,7 @@ const useEnchantmentStore = create<EnchantmentStore>()(
               addedEffects: id !== null ? [] : state.addedEffects,
             })),
           setSigilStoneTier: (tier) => set(() => ({ sigilStoneTier: tier })),
+          setSigilStonePatchEnabled: (enabled) => set(() => ({ sigilStonePatchEnabled: enabled })),
           resetEnchantment: () => {
             set(() => ({ addedEffects: [], itemName: '', sigilStoneId: null }));
           },
@@ -88,6 +93,7 @@ const useEnchantmentStore = create<EnchantmentStore>()(
               itemName: data.itemName ?? '',
               sigilStoneId: data.sigilStoneId ?? null,
               sigilStoneTier: data.sigilStoneTier ?? 'Transcendent',
+              sigilStonePatchEnabled: data.sigilStonePatchEnabled ?? true,
             }));
           },
         },
@@ -106,6 +112,7 @@ const useEnchantmentStore = create<EnchantmentStore>()(
         version: state.version,
         sigilStoneId: state.sigilStoneId,
         sigilStoneTier: state.sigilStoneTier,
+        sigilStonePatchEnabled: state.sigilStonePatchEnabled,
       }),
     },
   ),

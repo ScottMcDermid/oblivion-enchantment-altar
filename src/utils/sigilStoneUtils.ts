@@ -32,6 +32,11 @@ export type SigilStoneDefinition = {
    */
   weaponValues: SigilStoneTierMagnitudes;
   /**
+   * UOP/Remastered-corrected weapon values. Only present on stones that had
+   * a bugged progression in the vanilla game.
+   */
+  weaponValuesPatched?: SigilStoneTierMagnitudes;
+  /**
    * If true, weaponValues represent Durations rather than Magnitudes.
    * Used for Silence and Soul Trap whose sigil stone values are durations.
    */
@@ -50,6 +55,11 @@ export type SigilStoneDefinition = {
   wornEffectId: SpellEffectDefinitionId;
   /** Magnitudes for each tier (Descendent → Transcendent) */
   wornMagnitudes: SigilStoneTierMagnitudes;
+  /**
+   * UOP/Remastered-corrected worn magnitudes. Only present on stones that had
+   * a bugged progression in the vanilla game.
+   */
+  wornMagnitudesPatched?: SigilStoneTierMagnitudes;
   /** Specific attribute for the worn effect (e.g. 'Agility' for Fortify Agility) */
   wornAttribute?: Attribute;
   /** Specific skill for the worn effect */
@@ -244,7 +254,8 @@ export const sigilStoneDefinitions: SigilStoneDefinition[] = [
     weaponEffectId: 'FRDG', // Frost Damage
     weaponValues: [5, 10, 15, 20, 25],
     wornEffectId: 'FRSH', // Frost Shield
-    wornMagnitudes: [10, 13, 25, 18, 25],
+    wornMagnitudes: [10, 13, 25, 18, 25],   // Latent 25 is a vanilla bug
+    wornMagnitudesPatched: [10, 13, 16, 18, 25],
   },
   // Frost Damage / Resist Frost
   {
@@ -274,9 +285,11 @@ export const sigilStoneDefinitions: SigilStoneDefinition[] = [
   {
     id: 'shock-damage-resist-shock',
     weaponEffectId: 'SHDG', // Shock Damage
-    weaponValues: [15, 20, 15, 20, 25],
+    weaponValues: [15, 20, 15, 20, 25],      // Descendent 15 / Subjacent 20 are vanilla bugs
+    weaponValuesPatched: [5, 10, 15, 20, 25],
     wornEffectId: 'RSSH', // Resist Shock
-    wornMagnitudes: [5, 10, 25, 30, 35],
+    wornMagnitudes: [5, 10, 25, 30, 35],     // Latent 25 is a vanilla bug
+    wornMagnitudesPatched: [5, 10, 15, 30, 35],
   },
   // Shock Damage / Shock Shield
   {
@@ -284,7 +297,8 @@ export const sigilStoneDefinitions: SigilStoneDefinition[] = [
     weaponEffectId: 'SHDG', // Shock Damage
     weaponValues: [5, 10, 15, 20, 25],
     wornEffectId: 'LISH', // Shock Shield
-    wornMagnitudes: [10, 13, 25, 18, 25],
+    wornMagnitudes: [10, 13, 25, 18, 25],    // Latent 25 is a vanilla bug
+    wornMagnitudesPatched: [10, 13, 16, 18, 25],
   },
   // Silence / Chameleon — weaponValues are durations (seconds)
   {
@@ -311,7 +325,8 @@ export const sigilStoneDefinitions: SigilStoneDefinition[] = [
     weaponValues: [5, 10, 10, 15, 20],
     weaponValueIsDuration: true,
     wornEffectId: 'RSMA', // Resist Magic
-    wornMagnitudes: [5, 10, 10, 15, 20],
+    wornMagnitudes: [5, 10, 10, 15, 20],     // Subjacent 10 is a vanilla bug (should be 7)
+    wornMagnitudesPatched: [5, 7, 10, 15, 20],
   },
   // Turn Undead / Detect Life
   {
@@ -332,6 +347,21 @@ export function getSigilStoneTierIndex(tier: SigilStoneTier): number {
 
 export function getSigilStoneDefinitionById(id: string): SigilStoneDefinition | undefined {
   return sigilStoneDefinitions.find((s) => s.id === id);
+}
+
+/**
+ * Returns the tier magnitudes/values for one side of a sigil stone,
+ * using patched values if available and requested.
+ */
+export function getSigilStoneValues(
+  stone: SigilStoneDefinition,
+  side: 'weapon' | 'worn',
+  patched: boolean,
+): SigilStoneTierMagnitudes {
+  if (side === 'weapon') {
+    return (patched && stone.weaponValuesPatched) ? stone.weaponValuesPatched : stone.weaponValues;
+  }
+  return (patched && stone.wornMagnitudesPatched) ? stone.wornMagnitudesPatched : stone.wornMagnitudes;
 }
 
 /**
