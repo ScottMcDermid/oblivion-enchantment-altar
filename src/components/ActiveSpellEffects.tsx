@@ -6,6 +6,11 @@ import { Tooltip } from '@mui/material';
 import { cn } from '@/utils/cn';
 import { getConstantEffectMagnitude } from '@/utils/enchantmentUtils';
 import SpellEffectEditor from '@/components/SpellEffectEditor';
+import {
+  getSigilStoneDefinitionById,
+  getSigilStoneEffectName,
+  getSigilStoneTierIndex,
+} from '@/utils/sigilStoneUtils';
 
 const SKELETON_ROWS = [
   { nameWidth: 'w-3/4' },
@@ -52,7 +57,17 @@ export default function ActiveSpellEffects({
   expandedEffectId: string | null;
   onToggleExpand: (id: string) => void;
 }) {
-  const { addedEffects, equipmentType, soulGem } = useEnchantmentStore();
+  const { addedEffects, equipmentType, soulGem, sigilStoneId, sigilStoneTier } =
+    useEnchantmentStore();
+
+  // ── All hooks must be called unconditionally ────────────────────────────────
+
+  const sigilStone = useMemo(
+    () => (sigilStoneId ? getSigilStoneDefinitionById(sigilStoneId) : null),
+    [sigilStoneId],
+  );
+
+  const sigilTierIndex = useMemo(() => getSigilStoneTierIndex(sigilStoneTier), [sigilStoneTier]);
 
   const magnitudes = useMemo(
     () =>
@@ -95,39 +110,84 @@ export default function ActiveSpellEffects({
     [addedEffects, spellDefinitions],
   );
 
+  // ── Sigil Stone Mode ────────────────────────────────────────────────────────
+
+  if (sigilStone) {
+    const side = equipmentType === 'Weapon' ? 'weapon' : 'worn' as const;
+    const effectId = side === 'weapon' ? sigilStone.weaponEffectId : sigilStone.wornEffectId;
+    const definition = spellEffectDefinitionById[effectId];
+
+    let displayValue: string;
+    let displayLabel: string;
+
+    if (equipmentType === 'Weapon') {
+      const val = sigilStone.weaponValues[sigilTierIndex];
+      if (sigilStone.weaponValueIsDuration) {
+        displayValue = `${val}s`;
+        displayLabel = 'Duration';
+      } else {
+        displayValue = `${val} ${definition.unit}`;
+        displayLabel = 'Magnitude';
+      }
+    } else {
+      const mag = sigilStone.wornMagnitudes[sigilTierIndex];
+      displayValue = mag === 0 ? '—' : `${mag} ${definition.unit}`;
+      displayLabel = 'Magnitude';
+    }
+
+    return (
+      <div className="relative w-full bg-inherit">
+        {/* Header */}
+        <div className="sticky top-0 z-10 grid grid-cols-[2rem_minmax(0,1fr)_6rem] items-center bg-inherit py-2 pb-2 pr-2 pt-6 text-sm font-semibold shadow-lg">
+          <span />
+          <span />
+          <span className="text-right">{displayLabel}</span>
+        </div>
+
+        {/* Sigil stone effect row */}
+        <div className="grid grid-cols-[2rem_minmax(0,1fr)_6rem] items-center py-2 pl-1 pr-2 text-sm">
+          <Image
+            width={64}
+            height={64}
+            src="/icons/sigil-stone.png"
+            alt="Sigil Stone"
+            className="h-8 w-8 object-contain pl-1"
+          />
+          <div className="flex flex-col pl-1">
+            <span className="lg:text-lg">{getSigilStoneEffectName(sigilStone, side)}</span>
+            <span className="mt-0.5 w-fit rounded bg-yellow-900/50 px-1.5 py-0.5 text-[10px] leading-none text-yellow-300">
+              Sigil Stone
+            </span>
+          </div>
+          <span className="text-right">{displayValue}</span>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Regular Effect Mode ─────────────────────────────────────────────────────
+
   return (
     <div className="relative w-full bg-inherit">
       <div className="sticky top-0 z-10 grid grid-cols-[2rem_minmax(0,1fr)_4rem_4rem_4rem] items-center bg-inherit py-2 pb-2 pr-2 pt-6 text-sm font-semibold shadow-lg lg:grid-cols-[2rem_minmax(0,1fr)_6rem_4rem_6rem_6rem_6rem]">
-        {/* Spell effect icon */}
         <span></span>
-
-        {/* Spell effect name */}
         <span></span>
-
-        {/* Magnitude */}
         <span className="text-right">
           <span className="inline lg:hidden">Mag.</span>
           <span className="hidden lg:inline">Magnitude</span>
         </span>
-
-        {/* Area */}
         <span className="text-right">
           <span className="inline lg:hidden">Area</span>
           <span className="hidden lg:inline">Area</span>
         </span>
-
-        {/* Duration */}
         <span className="text-right">
           <span className="inline lg:hidden">Dur.</span>
           <span className="hidden lg:inline">Duration</span>
         </span>
-
-        {/* Magicka */}
         <span className="col-span-0 hidden text-right lg:col-span-1 lg:inline">Magicka</span>
-
-        {/* Gold */}
         <span className="col-span-0 hidden text-right lg:col-span-1 lg:inline">Gold</span>
       </div>
+
       {addedEffects.length === 0 && (
         <div className="items-center px-2 py-2 text-sm">No Active Effects</div>
       )}
@@ -150,7 +210,6 @@ export default function ActiveSpellEffects({
                 isExpanded ? 'border-l-4 border-l-yellow-400' : 'pl-1',
               )}
             >
-              {/* Spell effect icon */}
               <Tooltip title={definition.school}>
                 <Image
                   width={64}
@@ -161,10 +220,8 @@ export default function ActiveSpellEffects({
                 />
               </Tooltip>
 
-              {/* Spell effect name */}
               <span className="pl-1 lg:text-lg">{spellNames[i]}</span>
 
-              {/* Magnitude */}
               <span className="text-right">
                 {definition.availableParameters.includes('Magnitude') &&
                 definition.isLevelBasedMagnitude ? (
@@ -178,7 +235,6 @@ export default function ActiveSpellEffects({
                 )}
               </span>
 
-              {/* Area */}
               <span className="text-right">
                 {definition.availableParameters.includes('Area') && equipmentType !== 'Worn'
                   ? effect.area === 0
@@ -187,25 +243,21 @@ export default function ActiveSpellEffects({
                   : ''}
               </span>
 
-              {/* Duration */}
               <span className="text-right">
                 {definition.availableParameters.includes('Duration') &&
                   equipmentType !== 'Worn' &&
                   `${effect.duration}s`}
               </span>
 
-              {/* Magicka Cost */}
               <span className="col-span-0 hidden text-right lg:col-span-1 lg:inline">
                 {equipmentType !== 'Worn' && Intl.NumberFormat().format(effect.magickaCost)}
               </span>
 
-              {/* Gold Cost */}
               <span className="col-span-0 hidden text-right lg:col-span-1 lg:inline">
                 {Intl.NumberFormat().format(goldCosts[i])}
               </span>
             </div>
 
-            {/* Inline editor panel */}
             {equipmentType !== 'Worn' && (
               <div
                 className={cn(

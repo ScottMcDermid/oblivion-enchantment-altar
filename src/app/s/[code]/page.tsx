@@ -31,6 +31,8 @@ export default function SharedEnchantmentPage() {
       equipmentType: enchantment.equipmentType,
       soulGem: enchantment.soulGem,
       itemName: enchantment.name ?? '',
+      sigilStoneId: enchantment.sigilStoneId ?? null,
+      sigilStoneTier: enchantment.sigilStoneTier,
     });
   }, [params.code, loadEnchantment]);
 

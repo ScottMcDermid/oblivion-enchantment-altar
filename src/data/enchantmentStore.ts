@@ -3,6 +3,7 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { upsert } from '@/utils/array';
 import { type SoulGem } from '@/utils/enchantmentUtils';
+import { type SigilStoneTier } from '@/utils/sigilStoneUtils';
 
 type State = {
   addedEffects: SpellEffect[];
@@ -10,6 +11,8 @@ type State = {
   soulGem: SoulGem;
   itemName: string;
   version: number;
+  sigilStoneId: string | null;
+  sigilStoneTier: SigilStoneTier;
 };
 
 type Action = {
@@ -19,11 +22,15 @@ type Action = {
   toggleEquipmentType: () => void;
   setSoulGem: (soulGem: SoulGem) => void;
   setItemName: (name: string) => void;
+  setSigilStone: (id: string | null) => void;
+  setSigilStoneTier: (tier: SigilStoneTier) => void;
   loadEnchantment: (data: {
     addedEffects: SpellEffect[];
     equipmentType: EquipmentType;
     soulGem: SoulGem;
     itemName?: string;
+    sigilStoneId?: string | null;
+    sigilStoneTier?: SigilStoneTier;
   }) => void;
 };
 
@@ -38,6 +45,8 @@ const useEnchantmentStore = create<EnchantmentStore>()(
         soulGem: 'Grand',
         itemName: '',
         version: 1,
+        sigilStoneId: null,
+        sigilStoneTier: 'Transcendent',
         actions: {
           addSpellEffect: (effect) =>
             set((state) => ({
@@ -45,6 +54,8 @@ const useEnchantmentStore = create<EnchantmentStore>()(
                 state.equipmentType === 'Worn'
                   ? [effect]
                   : upsert<SpellEffect>(state.addedEffects, effect, 'id'),
+              // Adding a regular effect clears any active sigil stone
+              sigilStoneId: null,
             })),
           removeSpellEffect: (effect) =>
             set((state) => ({
@@ -59,8 +70,15 @@ const useEnchantmentStore = create<EnchantmentStore>()(
             })),
           setSoulGem: (soulGem) => set(() => ({ soulGem })),
           setItemName: (itemName) => set(() => ({ itemName })),
+          setSigilStone: (id) =>
+            set((state) => ({
+              sigilStoneId: id,
+              // Selecting a new sigil stone clears regular effects; clearing the stone preserves them (empty)
+              addedEffects: id !== null ? [] : state.addedEffects,
+            })),
+          setSigilStoneTier: (tier) => set(() => ({ sigilStoneTier: tier })),
           resetEnchantment: () => {
-            set(() => ({ addedEffects: [], itemName: '' }));
+            set(() => ({ addedEffects: [], itemName: '', sigilStoneId: null }));
           },
           loadEnchantment: (data) => {
             set(() => ({
@@ -68,6 +86,8 @@ const useEnchantmentStore = create<EnchantmentStore>()(
               equipmentType: data.equipmentType,
               soulGem: data.soulGem,
               itemName: data.itemName ?? '',
+              sigilStoneId: data.sigilStoneId ?? null,
+              sigilStoneTier: data.sigilStoneTier ?? 'Transcendent',
             }));
           },
         },
@@ -84,6 +104,8 @@ const useEnchantmentStore = create<EnchantmentStore>()(
         equipmentType: state.equipmentType,
         itemName: state.itemName,
         version: state.version,
+        sigilStoneId: state.sigilStoneId,
+        sigilStoneTier: state.sigilStoneTier,
       }),
     },
   ),

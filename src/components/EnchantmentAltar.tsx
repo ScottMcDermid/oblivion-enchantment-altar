@@ -12,6 +12,7 @@ import { useShareEnchantment } from '@/hooks/useShareEnchantment';
 import type { EnchantmentData } from '@/utils/enchantmentCodec';
 
 import SpellEffectSelector from '@/components/SpellEffectSelector';
+import EffectFilterDrawer from '@/components/EffectFilterDrawer';
 import {
   getMagickaCost,
   MIN_DURATION,
@@ -21,6 +22,7 @@ import {
   magnitudeByLockLevel,
   attributes,
   skills as selectableSkills,
+  type School,
   type SpellEffectDefinition,
 } from '@/utils/spellEffectUtils';
 
@@ -28,6 +30,7 @@ import { useEnchantmentStore } from '@/data/enchantmentStore';
 import ActiveSpellEffects, { EffectsSkeleton } from '@/components/ActiveSpellEffects';
 import ConfirmDialog from '@/components/ConfirmDialog';
 import { SoulGemSelector } from '@/components/SoulGemSelector';
+import SigilStoneTierSlider from '@/components/SigilStoneTierSlider';
 import { useHydrated } from '@/hooks/useHydrated';
 import { cn } from '@/utils/cn';
 
@@ -70,7 +73,8 @@ export default function EnchantmentAltar({ sharedEnchantment }: { sharedEnchantm
     addedEffects,
     equipmentType,
     itemName,
-    actions: { addSpellEffect, resetEnchantment, removeSpellEffect, toggleEquipmentType, loadEnchantment, setItemName },
+    sigilStoneId,
+    actions: { addSpellEffect, resetEnchantment, removeSpellEffect, toggleEquipmentType, loadEnchantment, setItemName, setSigilStone },
   } = useEnchantmentStore();
   const { copyShareUrl } = useShareEnchantment();
   const hydrated = useHydrated();
@@ -78,6 +82,23 @@ export default function EnchantmentAltar({ sharedEnchantment }: { sharedEnchantm
   const [isConfirmingReset, setIsConfirmingReset] = useState(false);
   const [isConfirmingEquipmentToggle, setIsConfirmingEquipmentToggle] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState<string | null>(null);
+
+  // Filter drawer state
+  const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
+  const [showSigilStones, setShowSigilStones] = useState(sigilStoneId !== null);
+  const [schoolFilter, setSchoolFilter] = useState<School | null>(null);
+
+  // Sigil stones available only when no regular effects are added
+  const sigilStonesAvailable = addedEffects.length === 0;
+
+  const handleModeChange = (mode: 'effects' | 'sigil-stones') => {
+    const next = mode === 'sigil-stones';
+    setShowSigilStones(next);
+    // Switching away from sigil stones clears the active stone
+    if (!next && sigilStoneId !== null) {
+      setSigilStone(null);
+    }
+  };
 
   const handleReset = (confirm: boolean) => {
     if (confirm) {
@@ -106,6 +127,8 @@ export default function EnchantmentAltar({ sharedEnchantment }: { sharedEnchantm
       addedEffects: sharedEnchantment.effects,
       equipmentType: sharedEnchantment.equipmentType,
       soulGem: sharedEnchantment.soulGem,
+      sigilStoneId: sharedEnchantment.sigilStoneId ?? null,
+      sigilStoneTier: sharedEnchantment.sigilStoneTier,
     });
     setSnackbarMessage('Enchantment copied to your altar!');
     window.location.href = '/';
@@ -167,7 +190,7 @@ export default function EnchantmentAltar({ sharedEnchantment }: { sharedEnchantm
             <Box sx={{ flex: 1 }} />
             {!isViewOnly && (
               <>
-                {addedEffects.length > 0 && (
+                {(addedEffects.length > 0 || sigilStoneId !== null) && (
                   <>
                     <Button
                       size="small"
@@ -195,8 +218,26 @@ export default function EnchantmentAltar({ sharedEnchantment }: { sharedEnchantm
           </Toolbar>
         </AppBar>
 
-        <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: 'calc(100vh - 48px)' }}>
-          <Box sx={{ mx: 'auto', width: '100%', maxWidth: '72rem', px: 2 }}>
+        <Box sx={{
+          display: 'flex',
+          height: { xs: 'auto', xl: 'calc(100vh - 48px)' },
+          overflow: { xs: 'visible', xl: 'hidden' },
+        }}>
+          {/* Filter drawer — persistent on xl desktop, Dialog on smaller screens */}
+          {!isViewOnly && (
+            <EffectFilterDrawer
+              open={filterDrawerOpen}
+              onClose={() => setFilterDrawerOpen(false)}
+              mode={showSigilStones ? 'sigil-stones' : 'effects'}
+              onModeChange={handleModeChange}
+              schoolFilter={schoolFilter}
+              onSchoolFilterChange={setSchoolFilter}
+              sigilStonesAvailable={sigilStonesAvailable}
+            />
+          )}
+
+          {/* Main content — shrinks when filter drawer opens */}
+          <Box sx={{ mx: 'auto', width: '100%', maxWidth: '72rem', px: 2, flex: 1, minWidth: 0, overflowY: { xl: 'auto' }, transition: 'all 225ms cubic-bezier(0.4, 0, 0.2, 1)' }}>
           <div className="flex w-full flex-1 flex-col gap-6 bg-inherit pt-4 sm:flex-row">
             {/* Spell effect selector (hidden in view-only mode) */}
             {!isViewOnly && (
@@ -223,6 +264,9 @@ export default function EnchantmentAltar({ sharedEnchantment }: { sharedEnchantm
                       ? setIsConfirmingEquipmentToggle(true)
                       : toggleEquipmentType()
                   }
+                  showSigilStones={showSigilStones}
+                  schoolFilter={schoolFilter}
+                  onToggleFilterDrawer={() => setFilterDrawerOpen((prev) => !prev)}
                 />
               </div>
             )}
@@ -231,7 +275,7 @@ export default function EnchantmentAltar({ sharedEnchantment }: { sharedEnchantm
               'mt-3 flex-1 bg-inherit lg:max-w-full',
               isViewOnly && 'mx-auto max-w-4xl',
             )}>
-              <SoulGemSelector />
+              {sigilStoneId ? <SigilStoneTierSlider /> : <SoulGemSelector />}
               {isViewOnly ? (
                 <>
                   {sharedEnchantment?.name && (
@@ -289,6 +333,7 @@ export default function EnchantmentAltar({ sharedEnchantment }: { sharedEnchantm
                 </>
               )}
             </div>
+
           </div>
           </Box>
         </Box>

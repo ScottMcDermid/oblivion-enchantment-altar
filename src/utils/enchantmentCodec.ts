@@ -23,6 +23,12 @@
  * Encoding format (v2): all of v1, plus after all effects:
  *   - 1 bit: has name flag
  *   - if set: 7 bits name length, then (length × 7) bits of 7-bit ASCII chars
+ *
+ * Encoding format (v3): all of v2, plus after name:
+ *   - 1 bit: has sigil stone flag
+ *   - if set:
+ *     - 5 bits: sigil stone index (0-29, into sigilStoneDefinitions array)
+ *     - 3 bits: sigil stone tier index (0-4)
  */
 
 import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';
@@ -42,8 +48,13 @@ import {
 } from '@/utils/spellEffectUtils';
 
 import { type SoulGem, soulGems } from '@/utils/enchantmentUtils';
+import {
+  sigilStoneDefinitions,
+  sigilStoneTiers,
+  type SigilStoneTier,
+} from '@/utils/sigilStoneUtils';
 
-const CODEC_VERSION = 2;
+const CODEC_VERSION = 3;
 const MAX_ITEM_NAME_LENGTH = 64;
 
 const equipmentTypes: EquipmentType[] = ['Weapon', 'Worn'];
@@ -115,6 +126,8 @@ export interface EnchantmentData {
   soulGem: SoulGem;
   effects: SpellEffect[];
   name?: string;
+  sigilStoneId?: string | null;
+  sigilStoneTier?: SigilStoneTier;
 }
 
 // ─── Encode ─────────────────────────────────────────────────────────────────
@@ -194,6 +207,21 @@ export function encodeEnchantment(data: EnchantmentData): string {
     writer.writeBits(0, 1);
   }
 
+  // Sigil stone (v3: 1 flag bit, then 5 bits stone index + 3 bits tier index)
+  if (data.sigilStoneId) {
+    const stoneIdx = sigilStoneDefinitions.findIndex((s) => s.id === data.sigilStoneId);
+    const tierIdx = sigilStoneTiers.indexOf(data.sigilStoneTier ?? 'Transcendent');
+    if (stoneIdx >= 0) {
+      writer.writeBits(1, 1);
+      writer.writeBits(stoneIdx, 5);
+      writer.writeBits(tierIdx >= 0 ? tierIdx : 4, 3);
+    } else {
+      writer.writeBits(0, 1);
+    }
+  } else {
+    writer.writeBits(0, 1);
+  }
+
   // Compress
   const bytes = writer.toUint8Array();
   const binaryString = String.fromCharCode.apply(null, Array.from(bytes));
@@ -216,7 +244,7 @@ export function decodeEnchantment(code: string): EnchantmentData | null {
 
     // Version
     const version = reader.readBits(8);
-    if (version !== 1 && version !== 2) return null;
+    if (version !== 1 && version !== 2 && version !== 3) return null;
 
     // Equipment type
     const equipmentTypeIdx = reader.readBits(1);
@@ -291,9 +319,9 @@ export function decodeEnchantment(code: string): EnchantmentData | null {
       });
     }
 
-    // Name (v2 only)
+    // Name (v2+)
     let name: string | undefined;
-    if (version === 2) {
+    if (version >= 2) {
       const hasName = reader.readBits(1);
       if (hasName) {
         const nameLength = reader.readBits(7);
@@ -305,7 +333,28 @@ export function decodeEnchantment(code: string): EnchantmentData | null {
       }
     }
 
-    return { equipmentType, soulGem, effects, ...(name !== undefined && { name }) };
+    // Sigil stone (v3+)
+    let sigilStoneId: string | null = null;
+    let sigilStoneTier: SigilStoneTier | undefined;
+    if (version >= 3) {
+      const hasSigilStone = reader.readBits(1);
+      if (hasSigilStone) {
+        const stoneIdx = reader.readBits(5);
+        const tierIdx = reader.readBits(3);
+        if (stoneIdx < sigilStoneDefinitions.length) {
+          sigilStoneId = sigilStoneDefinitions[stoneIdx].id;
+          sigilStoneTier = sigilStoneTiers[tierIdx] ?? 'Transcendent';
+        }
+      }
+    }
+
+    return {
+      equipmentType,
+      soulGem,
+      effects,
+      ...(name !== undefined && { name }),
+      ...(sigilStoneId !== null && { sigilStoneId, sigilStoneTier }),
+    };
   } catch {
     return null;
   }
