@@ -222,8 +222,8 @@ export default function EnchantmentAltar({ sharedEnchantment }: { sharedEnchantm
 
         <Box sx={{
           display: 'flex',
-          height: { xs: 'auto', xl: 'calc(100vh - 48px)' },
-          overflow: { xs: 'visible', xl: 'hidden' },
+          height: { xs: 'auto', sm: 'calc(100vh - 48px)' },
+          overflow: { xs: 'visible', sm: 'hidden' },
         }}>
           {/* Filter drawer — persistent on xl desktop, Dialog on smaller screens */}
           {!isViewOnly && (
@@ -240,9 +240,10 @@ export default function EnchantmentAltar({ sharedEnchantment }: { sharedEnchantm
             />
           )}
 
-          {/* Main content — shrinks when filter drawer opens */}
-          <Box sx={{ mx: 'auto', width: '100%', maxWidth: '72rem', px: 2, flex: 1, minWidth: 0, overflowY: { xl: 'auto' }, transition: 'all 225ms cubic-bezier(0.4, 0, 0.2, 1)' }}>
-          <div className="flex w-full flex-1 flex-col gap-6 bg-inherit pt-4 sm:flex-row">
+          {/* Main content column — fills viewport height, shrinks when drawer opens */}
+          <div className="flex min-w-0 flex-1 flex-col bg-inherit transition-all duration-[225ms] ease-[cubic-bezier(0.4,0,0.2,1)]">
+            <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col overflow-hidden bg-inherit px-2">
+          <div className="flex w-full flex-1 flex-col gap-6 bg-inherit pt-4 sm:flex-row sm:overflow-y-auto">
             {/* Spell effect selector (hidden in view-only mode) */}
             {!isViewOnly && (
               <div className="flex max-h-80 overflow-y-auto flex-shrink-0 flex-col sm:sticky sm:top-14 sm:overflow-visible sm:max-h-[calc(100vh-3.5rem)] sm:max-w-80">
@@ -341,7 +342,8 @@ export default function EnchantmentAltar({ sharedEnchantment }: { sharedEnchantm
             </div>
 
           </div>
-          </Box>
+            </div>
+          </div>
         </Box>
         <footer className="mt-16 w-full border-t border-gray-700 bg-neutral-900 px-6 py-8 text-sm text-gray-400">
           <div className="mx-auto flex w-full max-w-4xl flex-col gap-4 text-center sm:text-left">
