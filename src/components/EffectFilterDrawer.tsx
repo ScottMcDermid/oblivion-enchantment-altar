@@ -13,7 +13,6 @@ import {
   useMediaQuery,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import { GiCrystalBall, GiSpellBook } from 'react-icons/gi';
 import { FaBriefcaseMedical, FaEye, FaFeather, FaFireAlt } from 'react-icons/fa';
 import { GiDevilMask, GiDominoMask } from 'react-icons/gi';
 import type { IconType } from 'react-icons';
@@ -31,110 +30,66 @@ const schoolIcons: Record<School, IconType> = {
   Restoration: FaBriefcaseMedical,
 };
 
-type Mode = 'effects' | 'sigil-stones';
-
 function FiltersContent({
-  mode,
-  onModeChange,
   schoolFilter,
   onSchoolFilterChange,
-  sigilStonesAvailable,
   sigilStonePatchEnabled,
   onSigilStonePatchChange,
 }: {
-  mode: Mode;
-  onModeChange: (mode: Mode) => void;
   schoolFilter: School | null;
   onSchoolFilterChange: (school: School | null) => void;
-  sigilStonesAvailable: boolean;
   sigilStonePatchEnabled: boolean;
   onSigilStonePatchChange: (enabled: boolean) => void;
 }) {
   return (
     <div className="space-y-4 p-4">
-      {/* Effects / Sigil Stones toggle */}
+      {/* School chips */}
       <div>
         <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
-          Type
+          School
+        </div>
+        <div className="flex flex-wrap gap-1.5">
+          {schools.map((school) => {
+            const Icon = schoolIcons[school];
+            return (
+              <Chip
+                key={school}
+                icon={<Icon className="!text-xs" />}
+                label={school}
+                size="small"
+                variant={schoolFilter === school ? 'filled' : 'outlined'}
+                color={schoolFilter === school ? 'primary' : 'default'}
+                onClick={() => onSchoolFilterChange(schoolFilter === school ? null : school)}
+                className="text-xs"
+              />
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Vanilla / Patched toggle */}
+      <div>
+        <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
+          Sigil Stone Values
         </div>
         <ToggleButtonGroup
           exclusive
           fullWidth
-          value={mode}
-          onChange={(_e, val) => val !== null && onModeChange(val as Mode)}
+          value={sigilStonePatchEnabled ? 'patched' : 'vanilla'}
+          onChange={(_e, val) => val !== null && onSigilStonePatchChange(val === 'patched')}
           size="small"
         >
-          <ToggleButton value="effects" className="normal-case gap-1.5 py-1.5">
-            <GiSpellBook className="text-base" />
-            Effects
+          <ToggleButton value="vanilla" className="normal-case py-1.5">
+            Vanilla
           </ToggleButton>
-          <ToggleButton
-            value="sigil-stones"
-            disabled={!sigilStonesAvailable}
-            className="normal-case gap-1.5 py-1.5"
-          >
-            <GiCrystalBall className="text-base" />
-            Sigil Stones
+          <ToggleButton value="patched" className="normal-case py-1.5">
+            Patched
           </ToggleButton>
         </ToggleButtonGroup>
-        {!sigilStonesAvailable && (
-          <p className="mt-1.5 text-[11px] text-gray-500">
-            Remove active effects to use sigil stones.
-          </p>
-        )}
+        <p className="mt-1.5 text-[11px] text-gray-500">
+          Patched fixes erroneous values corrected by the Unofficial Oblivion Patch and Remastered.
+        </p>
       </div>
-
-      {/* School chips — only in Effects mode */}
-      {mode === 'effects' && (
-        <div>
-          <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
-            School
-          </div>
-          <div className="flex flex-wrap gap-1.5">
-            {schools.map((school) => {
-              const Icon = schoolIcons[school];
-              return (
-                <Chip
-                  key={school}
-                  icon={<Icon className="!text-xs" />}
-                  label={school}
-                  size="small"
-                  variant={schoolFilter === school ? 'filled' : 'outlined'}
-                  color={schoolFilter === school ? 'primary' : 'default'}
-                  onClick={() => onSchoolFilterChange(schoolFilter === school ? null : school)}
-                  className="text-xs"
-                />
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* Vanilla / Patched toggle — only in Sigil Stones mode */}
-      {mode === 'sigil-stones' && (
-        <div>
-          <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">
-            Values
-          </div>
-          <ToggleButtonGroup
-            exclusive
-            fullWidth
-            value={sigilStonePatchEnabled ? 'patched' : 'vanilla'}
-            onChange={(_e, val) => val !== null && onSigilStonePatchChange(val === 'patched')}
-            size="small"
-          >
-            <ToggleButton value="vanilla" className="normal-case py-1.5">
-              Vanilla
-            </ToggleButton>
-            <ToggleButton value="patched" className="normal-case py-1.5">
-              Patched
-            </ToggleButton>
-          </ToggleButtonGroup>
-          <p className="mt-1.5 text-[11px] text-gray-500">
-            Patched fixes erroneous values corrected by the Unofficial Oblivion Patch and Remastered.
-          </p>
-        </div>
-      )}
     </div>
   );
 }
@@ -142,27 +97,21 @@ function FiltersContent({
 export default function EffectFilterDrawer({
   open,
   onClose,
-  mode,
-  onModeChange,
   schoolFilter,
   onSchoolFilterChange,
-  sigilStonesAvailable,
   sigilStonePatchEnabled,
   onSigilStonePatchChange,
 }: {
   open: boolean;
   onClose: () => void;
-  mode: Mode;
-  onModeChange: (mode: Mode) => void;
   schoolFilter: School | null;
   onSchoolFilterChange: (school: School | null) => void;
-  sigilStonesAvailable: boolean;
   sigilStonePatchEnabled: boolean;
   onSigilStonePatchChange: (enabled: boolean) => void;
 }) {
-  const isDesktop = useMediaQuery('(min-width: 1280px)', { defaultMatches: false });
+  const isDesktop = useMediaQuery('(min-width: 1024px)', { defaultMatches: false });
 
-  const sharedProps = { mode, onModeChange, schoolFilter, onSchoolFilterChange, sigilStonesAvailable, sigilStonePatchEnabled, onSigilStonePatchChange };
+  const sharedProps = { schoolFilter, onSchoolFilterChange, sigilStonePatchEnabled, onSigilStonePatchChange };
 
   // ── Desktop: MUI persistent Drawer ─────────────────────────────────────────
   if (isDesktop) {

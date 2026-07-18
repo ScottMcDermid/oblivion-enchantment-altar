@@ -230,11 +230,8 @@ export default function EnchantmentAltar({ sharedEnchantment }: { sharedEnchantm
             <EffectFilterDrawer
               open={filterDrawerOpen}
               onClose={() => setFilterDrawerOpen(false)}
-              mode={showSigilStones ? 'sigil-stones' : 'effects'}
-              onModeChange={handleModeChange}
               schoolFilter={schoolFilter}
               onSchoolFilterChange={setSchoolFilter}
-              sigilStonesAvailable={sigilStonesAvailable}
               sigilStonePatchEnabled={sigilStonePatchEnabled}
               onSigilStonePatchChange={setSigilStonePatchEnabled}
             />

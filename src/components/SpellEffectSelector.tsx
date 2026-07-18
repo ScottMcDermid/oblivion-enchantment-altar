@@ -18,6 +18,7 @@ import { GiBroadsword, GiChestArmor, GiCrystalBall, GiSpellBook } from 'react-ic
 
 import {
   equipmentTypes,
+  spellEffectDefinitionById,
   weaponSpellEffectDefinitions,
   wornSpellEffectDefinitions,
   type EquipmentType,
@@ -71,6 +72,10 @@ export default function SpellEffectSelector({
 
   const filteredStones: SigilStoneDefinition[] = useMemo(
     () => sigilStoneDefinitions.filter((stone) => {
+      const side = equipmentType === 'Weapon' ? 'weapon' : 'worn' as const;
+      const activeEffectId = side === 'weapon' ? stone.weaponEffectId : stone.wornEffectId;
+      const school = spellEffectDefinitionById[activeEffectId].school;
+      if (schoolFilter !== null && school !== schoolFilter) return false;
       if (!search) return true;
       const q = search.toLowerCase();
       return (
@@ -78,7 +83,7 @@ export default function SpellEffectSelector({
         getSigilStoneEffectName(stone, 'worn').toLowerCase().includes(q)
       );
     }),
-    [search],
+    [search, schoolFilter, equipmentType],
   );
 
   return (
@@ -159,7 +164,7 @@ export default function SpellEffectSelector({
             <Badge
               color="secondary"
               variant="dot"
-              invisible={schoolFilter === null && !showSigilStones}
+              invisible={schoolFilter === null}
             >
               <FilterListIcon />
             </Badge>
