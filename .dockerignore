@@ -4,3 +4,5 @@ Dockerfile.dev
 Dockerfile.prod
 docker-compose.yml
 .git
+yarn.lock
+package-lock.json
