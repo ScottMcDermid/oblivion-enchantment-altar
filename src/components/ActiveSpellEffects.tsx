@@ -259,7 +259,10 @@ export default function ActiveSpellEffects({
               </span>
             </div>
 
-            {equipmentType !== 'Worn' && (
+            {(equipmentType !== 'Worn' ||
+              definition.selectableAttribute ||
+              definition.selectableSkill ||
+              definition.selectableLockLevel) && (
               <div
                 className={cn(
                   'grid transition-[grid-template-rows,opacity] duration-300 ease-in-out',
@@ -267,7 +270,11 @@ export default function ActiveSpellEffects({
                 )}
               >
                 <div className="min-h-0 overflow-hidden">
-                  <SpellEffectEditor effect={effect} effectDefinition={definition} />
+                  <SpellEffectEditor
+                    effect={effect}
+                    effectDefinition={definition}
+                    wornMode={equipmentType === 'Worn'}
+                  />
                 </div>
               </div>
             )}

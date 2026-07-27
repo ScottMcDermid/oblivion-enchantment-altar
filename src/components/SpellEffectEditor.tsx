@@ -44,9 +44,11 @@ const THROTTLE_MS = 150;
 export default function SpellEffectEditor({
   effect,
   effectDefinition,
+  wornMode = false,
 }: {
   effect: SpellEffect;
   effectDefinition: SpellEffectDefinition;
+  wornMode?: boolean;
 }) {
   const [magnitude, setMagnitude] = useState(effect.magnitude);
   const [area, setArea] = useState(effect.area);
@@ -211,7 +213,7 @@ export default function SpellEffectEditor({
           </FormControl>
         )}
 
-        {effectDefinition.availableParameters.includes('Magnitude') && (
+        {!wornMode && effectDefinition.availableParameters.includes('Magnitude') && (
           <div>
             <div className="mb-1 flex justify-between text-sm">
               <label>Magnitude</label>
@@ -236,7 +238,7 @@ export default function SpellEffectEditor({
           </div>
         )}
 
-        {effectDefinition.availableParameters.includes('Area') && (
+        {!wornMode && effectDefinition.availableParameters.includes('Area') && (
           <div>
             <div className="mb-1 flex justify-between text-sm">
               <label>Area</label>
@@ -253,7 +255,7 @@ export default function SpellEffectEditor({
           </div>
         )}
 
-        {effectDefinition.availableParameters.includes('Duration') && (
+        {!wornMode && effectDefinition.availableParameters.includes('Duration') && (
           <div>
             <div className="mb-1 flex justify-between text-sm">
               <label>Duration</label>
@@ -271,44 +273,46 @@ export default function SpellEffectEditor({
         )}
       </div>
 
-      <div className="mt-3 flex items-center justify-between">
-        <div className="flex items-center gap-4 text-sm">
-          <Tooltip title="Magicka Cost">
-            <div className="flex items-center gap-1">
-              <FlashOn fontSize="small" />
-              <span>{Intl.NumberFormat().format(Math.floor(magickaCost))}</span>
-            </div>
-          </Tooltip>
-          <Tooltip title="Gold Cost">
-            <div className="flex items-center gap-1">
-              <AttachMoney fontSize="small" />
-              <span>{Intl.NumberFormat().format(Math.floor(goldCost))}</span>
-            </div>
-          </Tooltip>
-        </div>
+      {!wornMode && (
+        <div className="mt-3 flex items-center justify-between">
+          <div className="flex items-center gap-4 text-sm">
+            <Tooltip title="Magicka Cost">
+              <div className="flex items-center gap-1">
+                <FlashOn fontSize="small" />
+                <span>{Intl.NumberFormat().format(Math.floor(magickaCost))}</span>
+              </div>
+            </Tooltip>
+            <Tooltip title="Gold Cost">
+              <div className="flex items-center gap-1">
+                <AttachMoney fontSize="small" />
+                <span>{Intl.NumberFormat().format(Math.floor(goldCost))}</span>
+              </div>
+            </Tooltip>
+          </div>
 
-        <div className="flex items-center gap-2">
-          <IconButton
-            className="sm:hidden"
-            color="error"
-            size="small"
-            aria-label="Remove Effect"
-            onClick={() => removeSpellEffect(effect)}
-          >
-            <DeleteIcon fontSize="small" />
-          </IconButton>
-          <Button
-            className="hidden sm:inline-flex"
-            color="error"
-            size="small"
-            aria-label="Remove Effect"
-            onClick={() => removeSpellEffect(effect)}
-            startIcon={<DeleteIcon fontSize="small" />}
-          >
-            Remove
-          </Button>
+          <div className="flex items-center gap-2">
+            <IconButton
+              className="sm:hidden"
+              color="error"
+              size="small"
+              aria-label="Remove Effect"
+              onClick={() => removeSpellEffect(effect)}
+            >
+              <DeleteIcon fontSize="small" />
+            </IconButton>
+            <Button
+              className="hidden sm:inline-flex"
+              color="error"
+              size="small"
+              aria-label="Remove Effect"
+              onClick={() => removeSpellEffect(effect)}
+              startIcon={<DeleteIcon fontSize="small" />}
+            >
+              Remove
+            </Button>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

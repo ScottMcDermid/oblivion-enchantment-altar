@@ -19,6 +19,7 @@ services:
       context: .
       dockerfile: Dockerfile.dev
     environment:
+      - CI=true
       - PORT=3000
       - WATCHPACK_POLLING=true
       - NODE_ENV=development

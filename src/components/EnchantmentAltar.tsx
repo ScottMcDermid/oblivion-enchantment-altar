@@ -22,8 +22,10 @@ import {
   magnitudeByLockLevel,
   attributes,
   skills as selectableSkills,
+  spellEffectDefinitionById,
   type School,
   type SpellEffectDefinition,
+  type SpellEffectDefinitionId,
 } from '@/utils/spellEffectUtils';
 
 import { useEnchantmentStore } from '@/data/enchantmentStore';
@@ -247,13 +249,17 @@ export default function EnchantmentAltar({ sharedEnchantment }: { sharedEnchantm
                 <SpellEffectSelector
                   onEffectSelect={(effect) => {
                     if (equipmentType === 'Worn') {
+                      const defaultEffect = createDefaultEffect(effect);
                       addSpellEffect({
-                        id: effect.id,
-                        magickaCost: effect.baseCost,
+                        ...defaultEffect,
                         magnitude: 0,
                         area: 0,
                         duration: 0,
+                        magickaCost: effect.baseCost,
                       });
+                      if (effect.selectableAttribute || effect.selectableSkill || effect.selectableLockLevel) {
+                        setExpandedEffectId(effect.id);
+                      }
                       return;
                     }
                     const defaultEffect = createDefaultEffect(effect);
@@ -325,9 +331,12 @@ export default function EnchantmentAltar({ sharedEnchantment }: { sharedEnchantm
                       expandedEffectId={expandedEffectId}
                       onToggleExpand={(id) => {
                         if (equipmentType === 'Worn') {
-                          removeSpellEffect(
-                            addedEffects.find((e) => e.id === id)!,
-                          );
+                          const def = spellEffectDefinitionById[id as SpellEffectDefinitionId];
+                          if (def.selectableAttribute || def.selectableSkill || def.selectableLockLevel) {
+                            setExpandedEffectId((prev) => (prev === id ? null : id));
+                          } else {
+                            removeSpellEffect(addedEffects.find((e) => e.id === id)!);
+                          }
                           return;
                         }
                         setExpandedEffectId((prev) => (prev === id ? null : id));
