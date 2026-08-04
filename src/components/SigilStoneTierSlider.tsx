@@ -44,6 +44,7 @@ export default function SigilStoneTierSlider() {
           '& .MuiSlider-markLabel': {
             fontSize: '0.65rem',
             color: '#9ca3af',
+            display: { xs: 'none', sm: 'block' },
           },
           '& .MuiSlider-markLabel[data-index="0"]': {
             transform: 'translateX(0%)',
