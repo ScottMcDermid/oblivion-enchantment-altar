@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import { Search } from '@mui/icons-material';
 import FilterListIcon from '@mui/icons-material/FilterList';
-import Image from 'next/image';
+import SpellEffectIcon from '@/components/SpellEffectIcon';
 import { GiBroadsword, GiChestArmor, GiCrystalBall, GiSpellBook } from 'react-icons/gi';
 
 import {
@@ -190,12 +190,10 @@ export default function SpellEffectSelector({
                     sx={{ borderColor: isSelected ? undefined : '#3a3a3a' }}
                   >
                     <div className="flex items-center gap-2 p-0.5">
-                      <Image
-                        src={`/icons/spell-effects/${equipmentType === 'Weapon' ? stone.weaponEffectId : stone.wornEffectId}.png`}
-                        width={64}
-                        height={64}
+                      <SpellEffectIcon
+                        id={equipmentType === 'Weapon' ? stone.weaponEffectId : stone.wornEffectId}
+                        size={28}
                         alt={getSigilStoneEffectName(stone, equipmentType === 'Weapon' ? 'weapon' : 'worn')}
-                        className="h-7 w-7 flex-shrink-0 object-contain lg:h-9 lg:w-9"
                       />
                       <div className="flex flex-col">
                         <span className="text-sm lg:text-base">
@@ -228,12 +226,10 @@ export default function SpellEffectSelector({
                 >
                   <div className="flex items-center gap-2 p-0.5">
                     <Tooltip title={effect.school}>
-                      <Image
-                        src={`/icons/spell-effects/${effect.id}.png`}
-                        width={64}
-                        height={64}
+                      <SpellEffectIcon
+                        id={effect.id}
+                        size={28}
                         alt={effect.name}
-                        className="h-7 w-7 lg:h-9 lg:w-9"
                       />
                     </Tooltip>
                     <span className="flex-1 text-sm lg:text-base">{effect.name}</span>

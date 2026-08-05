@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useEnchantmentStore } from '@/data/enchantmentStore';
-import Image from 'next/image';
+import SpellEffectIcon from '@/components/SpellEffectIcon';
 import { getGoldCost, spellEffectDefinitionById } from '@/utils/spellEffectUtils';
 import { Tooltip } from '@mui/material';
 import { cn } from '@/utils/cn';
@@ -147,12 +147,11 @@ export default function ActiveSpellEffects({
 
         {/* Sigil stone effect row */}
         <div className="grid grid-cols-[2rem_minmax(0,1fr)_6rem] items-center py-2 pl-1 pr-2 text-sm">
-          <Image
-            width={64}
-            height={64}
-            src={`/icons/spell-effects/${effectId}.png`}
+          <SpellEffectIcon
+            id={effectId}
+            size={32}
             alt={getSigilStoneEffectName(sigilStone, side)}
-            className="h-8 w-8 object-contain pl-1"
+            className="pl-1"
           />
           <div className="flex flex-col pl-1">
             <span className="lg:text-lg">{getSigilStoneEffectName(sigilStone, side)}</span>
@@ -212,12 +211,11 @@ export default function ActiveSpellEffects({
               )}
             >
               <Tooltip title={definition.school}>
-                <Image
-                  width={64}
-                  height={64}
-                  src={`/icons/spell-effects/${effect.id}.png`}
+                <SpellEffectIcon
+                  id={effect.id}
+                  size={32}
                   alt={definition.name}
-                  className="h-8 w-8 object-contain pl-1 lg:h-8 lg:w-8"
+                  className="pl-1"
                 />
               </Tooltip>
 
