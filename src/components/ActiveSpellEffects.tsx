@@ -153,7 +153,7 @@ export default function ActiveSpellEffects({
             alt={getSigilStoneEffectName(sigilStone, side)}
             className="pl-1"
           />
-          <div className="flex flex-col pl-1">
+          <div className="flex flex-col pl-2">
             <span className="lg:text-lg">{getSigilStoneEffectName(sigilStone, side)}</span>
             <span className="mt-0.5 w-fit rounded bg-yellow-900/50 px-1.5 py-0.5 text-[10px] leading-none text-yellow-300">
               Sigil Stone
@@ -219,7 +219,7 @@ export default function ActiveSpellEffects({
                 />
               </Tooltip>
 
-              <span className="pl-1 lg:text-lg">{spellNames[i]}</span>
+              <span className="pl-2 lg:text-lg">{spellNames[i]}</span>
 
               <span className="text-right">
                 {definition.availableParameters.includes('Magnitude') &&
