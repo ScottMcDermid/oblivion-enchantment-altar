@@ -224,8 +224,8 @@ export default function EnchantmentAltar({ sharedEnchantment }: { sharedEnchantm
 
         <Box sx={{
           display: 'flex',
-          height: { xs: 'auto', sm: 'calc(100vh - 48px)' },
-          overflow: { xs: 'visible', sm: 'hidden' },
+          height: 'calc(100vh - 48px)',
+          overflow: 'hidden',
         }}>
           {/* Filter drawer — persistent on xl desktop, Dialog on smaller screens */}
           {!isViewOnly && (
@@ -240,12 +240,12 @@ export default function EnchantmentAltar({ sharedEnchantment }: { sharedEnchantm
           )}
 
           {/* Main content column — fills viewport height, shrinks when drawer opens */}
-          <div className="flex min-w-0 flex-1 flex-col bg-inherit transition-all duration-[225ms] ease-[cubic-bezier(0.4,0,0.2,1)] min-h-screen">
+          <div className="flex min-w-0 flex-1 flex-col bg-inherit transition-all duration-[225ms] ease-[cubic-bezier(0.4,0,0.2,1)] overflow-hidden">
             <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col overflow-hidden bg-inherit px-2">
-          <div className="flex w-full flex-1 flex-col gap-6 bg-inherit pt-4 sm:flex-row sm:overflow-y-auto">
+          <div className="flex w-full flex-1 flex-col gap-4 bg-inherit pt-4 overflow-hidden sm:flex-row sm:overflow-y-auto">
             {/* Spell effect selector (hidden in view-only mode) */}
             {!isViewOnly && (
-              <div className="flex max-h-80 overflow-y-auto flex-shrink-0 flex-col sm:sticky sm:top-14 sm:overflow-visible sm:max-h-[calc(100vh-3.5rem)] sm:max-w-80">
+              <div className="flex flex-[0_0_55%] min-h-0 flex-shrink-0 flex-col sm:flex-none sm:sticky sm:top-14 sm:overflow-visible sm:max-h-[calc(100vh-3.5rem)] sm:max-w-80">
                 <SpellEffectSelector
                   onEffectSelect={(effect) => {
                     if (equipmentType === 'Worn') {
@@ -282,7 +282,7 @@ export default function EnchantmentAltar({ sharedEnchantment }: { sharedEnchantm
             )}
 
             <div className={cn(
-              'mt-3 flex-1 bg-inherit lg:max-w-full',
+              'flex-1 min-h-0 overflow-y-auto bg-inherit lg:max-w-full',
               isViewOnly && 'mx-auto max-w-4xl',
             )}>
               {(sigilStoneId !== null || showSigilStones) ? <SigilStoneTierSlider /> : <SoulGemSelector />}
