@@ -240,7 +240,7 @@ export default function EnchantmentAltar({ sharedEnchantment }: { sharedEnchantm
           )}
 
           {/* Main content column — fills viewport height, shrinks when drawer opens */}
-          <div className="flex min-w-0 flex-1 flex-col bg-inherit transition-all duration-[225ms] ease-[cubic-bezier(0.4,0,0.2,1)]">
+          <div className="flex min-w-0 flex-1 flex-col bg-inherit transition-all duration-[225ms] ease-[cubic-bezier(0.4,0,0.2,1)] min-h-screen">
             <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col overflow-hidden bg-inherit px-2">
           <div className="flex w-full flex-1 flex-col gap-6 bg-inherit pt-4 sm:flex-row sm:overflow-y-auto">
             {/* Spell effect selector (hidden in view-only mode) */}
