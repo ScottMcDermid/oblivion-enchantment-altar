@@ -30,26 +30,26 @@ import { useEnchantmentStore } from '@/data/enchantmentStore';
 
 export default function SpellEffectSelector({
   onEffectSelect,
+  onSigilStoneSelect,
   equipmentType,
   onEquipmentTypeChange,
   showSigilStones,
   onModeChange,
-  sigilStonesAvailable,
   schoolFilter,
   onToggleFilterDrawer,
 }: {
   onEffectSelect: (effect: SpellEffectDefinition) => void;
+  onSigilStoneSelect: (id: string | null) => void;
   equipmentType: EquipmentType;
   onEquipmentTypeChange: (type: EquipmentType) => void;
   showSigilStones: boolean;
   onModeChange: (showSigilStones: boolean) => void;
-  sigilStonesAvailable: boolean;
   schoolFilter: School | null;
   onToggleFilterDrawer: () => void;
 }) {
   const [search, setSearch] = useState('');
 
-  const { addedEffects, sigilStoneId, actions: { setSigilStone } } = useEnchantmentStore();
+  const { addedEffects, sigilStoneId } = useEnchantmentStore();
 
   const spellEffectDefinitions = useMemo(
     () => equipmentType === 'Weapon' ? weaponSpellEffectDefinitions : wornSpellEffectDefinitions,
@@ -123,18 +123,12 @@ export default function SpellEffectSelector({
           </ToggleButton>
           <ToggleButton
             value="sigil-stones"
-            disabled={!sigilStonesAvailable}
             className="normal-case gap-1.5 py-1.5"
           >
             <GiCrystalBall className="text-base" />
             Sigil Stones
           </ToggleButton>
         </ToggleButtonGroup>
-        {!sigilStonesAvailable && (
-          <p className="mt-1.5 w-full text-[11px] text-gray-500">
-            Remove active effects to use sigil stones.
-          </p>
-        )}
       </div>
 
       {/* Search field + filter button */}
@@ -185,7 +179,7 @@ export default function SpellEffectSelector({
                     variant={isSelected ? 'contained' : 'outlined'}
                     color={isSelected ? 'primary' : 'inherit'}
                     fullWidth
-                    onClick={() => setSigilStone(isSelected ? null : stone.id)}
+                    onClick={() => onSigilStoneSelect(isSelected ? null : stone.id)}
                     className="justify-start text-left normal-case"
                     sx={{ borderColor: isSelected ? undefined : '#3a3a3a' }}
                   >

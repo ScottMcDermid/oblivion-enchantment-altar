@@ -84,15 +84,13 @@ export default function EnchantmentAltar({ sharedEnchantment }: { sharedEnchantm
   const [expandedEffectId, setExpandedEffectId] = useState<string | null>(null);
   const [isConfirmingReset, setIsConfirmingReset] = useState(false);
   const [isConfirmingEquipmentToggle, setIsConfirmingEquipmentToggle] = useState(false);
+  const [pendingSigilStoneId, setPendingSigilStoneId] = useState<string | null>(null);
   const [snackbarMessage, setSnackbarMessage] = useState<string | null>(null);
 
   // Filter drawer state
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
   const [showSigilStones, setShowSigilStones] = useState(sigilStoneId !== null);
   const [schoolFilter, setSchoolFilter] = useState<School | null>(null);
-
-  // Sigil stones available only when no regular effects are added
-  const sigilStonesAvailable = addedEffects.length === 0;
 
   const handleModeChange = (mode: 'effects' | 'sigil-stones') => {
     const next = mode === 'sigil-stones';
@@ -117,6 +115,13 @@ export default function EnchantmentAltar({ sharedEnchantment }: { sharedEnchantm
       setExpandedEffectId(null);
     }
     setIsConfirmingEquipmentToggle(false);
+  };
+
+  const handleSigilStoneSelect = (confirm: boolean) => {
+    if (confirm) {
+      setSigilStone(pendingSigilStoneId);
+    }
+    setPendingSigilStoneId(null);
   };
 
   const handleShare = async () => {
@@ -274,7 +279,13 @@ export default function EnchantmentAltar({ sharedEnchantment }: { sharedEnchantm
                   }
                   showSigilStones={showSigilStones}
                   onModeChange={(next) => handleModeChange(next ? 'sigil-stones' : 'effects')}
-                  sigilStonesAvailable={sigilStonesAvailable}
+                  onSigilStoneSelect={(id) => {
+                    if (id !== null && addedEffects.length > 0) {
+                      setPendingSigilStoneId(id);
+                    } else {
+                      setSigilStone(id);
+                    }
+                  }}
                   schoolFilter={schoolFilter}
                   onToggleFilterDrawer={() => setFilterDrawerOpen((prev) => !prev)}
                 />
@@ -401,6 +412,12 @@ export default function EnchantmentAltar({ sharedEnchantment }: { sharedEnchantm
               open={isConfirmingEquipmentToggle}
               description="This will delete all enchantment effects"
               handleClose={handleEquipmentToggle}
+            />
+
+            <ConfirmDialog
+              open={pendingSigilStoneId !== null}
+              description="This will delete all enchantment effects"
+              handleClose={handleSigilStoneSelect}
             />
           </>
         )}
